@@ -46,7 +46,7 @@
             // button1
             // 
             button1.Location = new Point(504, 155);
-            button1.Name = "buttonGen";
+            button1.Name = "button1";
             button1.Size = new Size(94, 29);
             button1.TabIndex = 0;
             button1.Text = "gen";
@@ -65,7 +65,7 @@
             // button2
             // 
             button2.Location = new Point(619, 155);
-            button2.Name = "buttonClear";
+            button2.Name = "button2";
             button2.Size = new Size(94, 29);
             button2.TabIndex = 2;
             button2.Text = "clear";
@@ -77,14 +77,13 @@
             listBoxShapesInfo.Dock = DockStyle.Right;
             listBoxShapesInfo.DrawMode = DrawMode.OwnerDrawVariable;
             listBoxShapesInfo.FormattingEnabled = true;
-            listBoxShapesInfo.ItemHeight = 20;
+            listBoxShapesInfo.ItemHeight = 40;
             listBoxShapesInfo.Location = new Point(719, 0);
             listBoxShapesInfo.Name = "listBoxShapesInfo";
             listBoxShapesInfo.Size = new Size(279, 521);
             listBoxShapesInfo.Sorted = true;
             listBoxShapesInfo.TabIndex = 3;
             listBoxShapesInfo.DrawItem += listBoxShapesInfo_DrawItem;
-            listBoxShapesInfo.MeasureItem += listBoxShapesInfo_MeasureItem;
             // 
             // label1
             // 

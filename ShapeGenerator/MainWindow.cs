@@ -92,8 +92,6 @@ namespace ShapeGenerator
                     Debug.WriteLine("Attempt to draw shapes of unknown type");
                     break;
             }
-
-            listBoxShapesInfo.Refresh();
         }
 
         private void buttonClear_Click(object sender, EventArgs e)
@@ -104,28 +102,26 @@ namespace ShapeGenerator
             shapes.Clear();
         }
 
-        private void listBoxShapesInfo_MeasureItem(object sender, MeasureItemEventArgs e)
-        {
-            listBoxShapesInfo.ItemHeight = 40;
-        }
-
         private void listBoxShapesInfo_DrawItem(object sender, DrawItemEventArgs e)
         {
+
             e.DrawBackground();
 
             if (e.Index >= 0)
             {
                 var text = listBoxShapesInfo.Items[e.Index].ToString();
-                SizeF size = e.Graphics.MeasureString(text, listBoxShapesInfo.Font);
 
-                RectangleF rect1 = new RectangleF(e.Bounds.X, e.Bounds.Y, e.Bounds.Width, size.Height * 2);
+                //e.Bounds.Height = size.Height * 2;
+                RectangleF rect1 = new RectangleF(e.Bounds.X, e.Bounds.Y, e.Bounds.Width, listBoxShapesInfo.ItemHeight);
                 e.Graphics.DrawString(text, listBoxShapesInfo.Font, Brushes.Black, rect1);
 
                 if ((e.State & DrawItemState.Selected) == DrawItemState.Selected)
                 {
                     e.DrawFocusRectangle();
                 }
+                Debug.WriteLine(e.Bounds + " " + rect1.Height + " " + rect1.Width);
             }
+
         }
 
         private void textBoxFrom_KeyPress(object sender, KeyPressEventArgs e)
