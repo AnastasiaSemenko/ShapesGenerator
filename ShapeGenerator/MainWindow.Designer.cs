@@ -81,7 +81,6 @@
             listBoxShapesInfo.Location = new Point(719, 0);
             listBoxShapesInfo.Name = "listBoxShapesInfo";
             listBoxShapesInfo.Size = new Size(279, 521);
-            listBoxShapesInfo.Sorted = true;
             listBoxShapesInfo.TabIndex = 3;
             listBoxShapesInfo.DrawItem += listBoxShapesInfo_DrawItem;
             // 

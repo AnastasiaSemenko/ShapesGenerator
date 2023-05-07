@@ -1,4 +1,5 @@
 ﻿using ShapeGenerator.Shapes;
+using System.Collections;
 using System.Diagnostics;
 
 namespace ShapeGenerator
@@ -42,7 +43,7 @@ namespace ShapeGenerator
                         var point = new Point(random.Next(maxX), random.Next(maxY));
                         square.Draw(point, pictureBox1.CreateGraphics());
                         shapes.Add(square);
-                        listBoxShapesInfo.Items.Add(square);
+                        //listBoxShapesInfo.Items.Add(square);
                     }
 
                     break;
@@ -56,7 +57,7 @@ namespace ShapeGenerator
                         var tpoint = new Point(random.Next(maxX), random.Next(maxY));
                         triangle.Draw(tpoint, pictureBox1.CreateGraphics());
                         shapes.Add(triangle);
-                        listBoxShapesInfo.Items.Add(triangle);
+                        //listBoxShapesInfo.Items.Add(triangle);
                     }
 
                     break;
@@ -70,7 +71,7 @@ namespace ShapeGenerator
                         var rpoint = new Point(random.Next(maxX), random.Next(maxY));
                         rectangle.Draw(rpoint, pictureBox1.CreateGraphics());
                         shapes.Add(rectangle);
-                        listBoxShapesInfo.Items.Add(rectangle);
+                        //listBoxShapesInfo.Items.Add(rectangle);
                     }
 
                     break;
@@ -84,7 +85,7 @@ namespace ShapeGenerator
                         var hpoint = new Point(random.Next(maxX), random.Next(maxY));
                         hexagon.Draw(hpoint, pictureBox1.CreateGraphics());
                         shapes.Add(hexagon);
-                        listBoxShapesInfo.Items.Add(hexagon);
+                        //listBoxShapesInfo.Items.Add(hexagon);
                     }
 
                     break;
@@ -92,6 +93,12 @@ namespace ShapeGenerator
                     Debug.WriteLine("Attempt to draw shapes of unknown type");
                     break;
             }
+
+            shapes.Sort(new FigureComparer());
+            listBoxShapesInfo.Items.Clear();
+
+            foreach (var shape in shapes)
+                listBoxShapesInfo.Items.Add(shape);
         }
 
         private void buttonClear_Click(object sender, EventArgs e)

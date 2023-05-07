@@ -59,7 +59,7 @@
 
         public override string ToString()
         {
-            return $"{Name}:\n{PointA.X} {PointA.Y} {PointB.X} {PointB.Y} {PointC.X} {PointC.Y} " +
+            return $"{Name} :\n{PointA.X} {PointA.Y} {PointB.X} {PointB.Y} {PointC.X} {PointC.Y} " +
                 $"{PointD.X} {PointD.Y} {PointE.X} {PointE.Y} {PointF.X} {PointF.Y}";
         }
     }
