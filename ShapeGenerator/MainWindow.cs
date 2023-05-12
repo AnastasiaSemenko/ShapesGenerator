@@ -1,184 +1,143 @@
-﻿using ShapeGenerator.Shapes;
-using System.Collections;
-using System.Diagnostics;
+﻿using Enums.ShapeGenerator;
+using ShapeGenerator.Enums;
+using ShapeGenerator.Shapes;
 
 namespace ShapeGenerator
 {
     public partial class MainWindow : Form
     {
-        private Button selectedButton;
-        private Type selectedTypeShape;
-        private Random random = new Random();
+        private static List<Shape> shapes = new();
 
-        public static List<Shape> shapes = new List<Shape>();
-        public int from;
-        public int to;
-        public int size = 50;
+        private Button _selectedButton;
+        private FigureShape _selectedFigureShape;
+        private DrawingOption _selectedDrawingOption;
+        private int _from;
+        private int _to;
+        private int size = 50; //////////////////////////////////////////////////////////////
+
+        public static List<Shape> Shapes { get => shapes; set => shapes = value; }
 
         public MainWindow()
         {
             InitializeComponent();
+            WindowState = FormWindowState.Maximized;
+            UpdateSelectedButton(buttonSquare);
+            _selectedFigureShape = FigureShape.Square;
+            radioButtonIntersecting.Checked = true;
         }
 
-        private void buttonGen_Click(object sender, EventArgs e)
+        private void ButtonGen_Click(object sender, EventArgs e)
         {
-            from = int.Parse(textBoxFrom.Text);
-            to = int.Parse(textBoxTo.Text);
-            var count = random.Next(from, to);
-            int maxX;
-            int maxY;
-
-            if (selectedTypeShape == null)
-                return; //
-
-            switch (selectedTypeShape.Name)
-            {
-                case "Square":
-                    maxX = pictureBox1.Width - size;
-                    maxY = pictureBox1.Height - size;
-
-                    for (int i = 0; i < count; i++)
-                    {
-                        var square = new Square(size);
-                        var point = new Point(random.Next(maxX), random.Next(maxY));
-                        square.Draw(point, pictureBox1.CreateGraphics());
-                        shapes.Add(square);
-                        //listBoxShapesInfo.Items.Add(square);
-                    }
-
-                    break;
-                case "Triangle":
-                    maxX = pictureBox1.Width - size;
-                    maxY = (int)Math.Ceiling(pictureBox1.Height - size * Math.Sqrt(3) / 2);
-
-                    for (int i = 0; i < count; i++)
-                    {
-                        var triangle = new Triangle(size);
-                        var tpoint = new Point(random.Next(maxX), random.Next(maxY));
-                        triangle.Draw(tpoint, pictureBox1.CreateGraphics());
-                        shapes.Add(triangle);
-                        //listBoxShapesInfo.Items.Add(triangle);
-                    }
-
-                    break;
-                case "Rectangle":
-                    maxX = pictureBox1.Width - size * 2;
-                    maxY = pictureBox1.Height - size;
-
-                    for (int i = 0; i < count; i++)
-                    {
-                        var rectangle = new Shapes.Rectangle(size);
-                        var rpoint = new Point(random.Next(maxX), random.Next(maxY));
-                        rectangle.Draw(rpoint, pictureBox1.CreateGraphics());
-                        shapes.Add(rectangle);
-                        //listBoxShapesInfo.Items.Add(rectangle);
-                    }
-
-                    break;
-                case "Hexagon":
-                    maxX = pictureBox1.Width - size * 2;
-                    maxY = pictureBox1.Height - size * 2;
-
-                    for (int i = 0; i < count; i++)
-                    {
-                        var hexagon = new Hexagon(size);
-                        var hpoint = new Point(random.Next(maxX), random.Next(maxY));
-                        hexagon.Draw(hpoint, pictureBox1.CreateGraphics());
-                        shapes.Add(hexagon);
-                        //listBoxShapesInfo.Items.Add(hexagon);
-                    }
-
-                    break;
-                default:
-                    Debug.WriteLine("Attempt to draw shapes of unknown type");
-                    break;
-            }
-
-            shapes.Sort(new FigureComparer());
+            _from = int.Parse(textBoxFrom.Text);
+            _to = int.Parse(textBoxTo.Text);
+            Drawer.DrawShapes(_from, _to, _selectedFigureShape, _selectedDrawingOption, pictureBox);
+            Shapes.Sort(new FigureComparer());
             listBoxShapesInfo.Items.Clear();
 
-            foreach (var shape in shapes)
+            foreach (var shape in Shapes)
                 listBoxShapesInfo.Items.Add(shape);
         }
 
-        private void buttonClear_Click(object sender, EventArgs e)
+        private void ButtonClear_Click(object sender, EventArgs e)
         {
-            pictureBox1.Image = null;
-            pictureBox1.Update();
+            pictureBox.Invalidate();
             listBoxShapesInfo.Items.Clear();
-            shapes.Clear();
+            Shapes.Clear();
+            pictureBox.Update();
         }
 
-        private void listBoxShapesInfo_DrawItem(object sender, DrawItemEventArgs e)
+        private void ListBoxShapesInfo_DrawItem(object sender, DrawItemEventArgs e)
         {
-
             e.DrawBackground();
 
             if (e.Index >= 0)
             {
                 var text = listBoxShapesInfo.Items[e.Index].ToString();
-
-                //e.Bounds.Height = size.Height * 2;
-                RectangleF rect1 = new RectangleF(e.Bounds.X, e.Bounds.Y, e.Bounds.Width, listBoxShapesInfo.ItemHeight);
+                var rect1 = new System.Drawing.Rectangle(e.Bounds.X, e.Bounds.Y, e.Bounds.Width, listBoxShapesInfo.ItemHeight);
                 e.Graphics.DrawString(text, listBoxShapesInfo.Font, Brushes.Black, rect1);
 
                 if ((e.State & DrawItemState.Selected) == DrawItemState.Selected)
-                {
                     e.DrawFocusRectangle();
-                }
-                Debug.WriteLine(e.Bounds + " " + rect1.Height + " " + rect1.Width);
             }
-
         }
 
-        private void textBoxFrom_KeyPress(object sender, KeyPressEventArgs e)
+        private void TextBoxFrom_KeyPress(object sender, KeyPressEventArgs e)
         {
             if (!char.IsDigit(e.KeyChar) && e.KeyChar != '\b')
                 e.Handled = true;
         }
 
-        private void textBoxTo_KeyPress(object sender, KeyPressEventArgs e)
+        private void TextBoxTo_KeyPress(object sender, KeyPressEventArgs e)
         {
             if (!char.IsDigit(e.KeyChar) && e.KeyChar != '\b')
                 e.Handled = true;
 
         }
 
-        private void buttonSquare_Click(object sender, EventArgs e)
+        private void ButtonSquare_Click(object sender, EventArgs e)
         {
             UpdateSelectedButton((Button)sender);
-            selectedTypeShape = typeof(Square);
+            _selectedFigureShape = FigureShape.Square;
         }
 
-        private void buttonTriangle_Click(object sender, EventArgs e)
+        private void ButtonTriangle_Click(object sender, EventArgs e)
         {
             UpdateSelectedButton((Button)sender);
-            selectedTypeShape = typeof(Triangle);
+            _selectedFigureShape = FigureShape.Triangle;
         }
 
-        private void buttonRectangle_Click(object sender, EventArgs e)
+        private void ButtonRectangle_Click(object sender, EventArgs e)
         {
             UpdateSelectedButton((Button)sender);
-            selectedTypeShape = typeof(Shapes.Rectangle);
+            _selectedFigureShape = FigureShape.Rectangle;
         }
 
-        private void buttonHexagon_Click(object sender, EventArgs e)
+        private void ButtonHexagon_Click(object sender, EventArgs e)
         {
             UpdateSelectedButton((Button)sender);
-            selectedTypeShape = typeof(Hexagon);
+            _selectedFigureShape = FigureShape.Hexagon;
         }
 
         private void UpdateSelectedButton(Button newSelectedButton)
         {
-            if (selectedButton != null)
+            if (_selectedButton != null)
             {
-                selectedButton.BackColor = DefaultBackColor;
-                selectedButton.ForeColor = DefaultForeColor;
+                _selectedButton.BackColor = DefaultBackColor;
+                _selectedButton.ForeColor = DefaultForeColor;
             }
 
-            selectedButton = newSelectedButton;
-            selectedButton.BackColor = Color.Blue;
-            selectedButton.ForeColor = Color.White;
+            _selectedButton = newSelectedButton;
+            _selectedButton.BackColor = Color.Blue;
+            _selectedButton.ForeColor = Color.White;
+        }
+
+        private void pictureBox1_SizeChanged(object sender, EventArgs e)
+        {
+            panel.AutoScrollMinSize = pictureBox.Size;
+        }
+
+        private void pictureBox1_Paint(object sender, PaintEventArgs e)
+        {
+            foreach (var shape in Shapes)
+                shape.Draw(e.Graphics);
+        }
+
+        private void radioButtonIntersecting_CheckedChanged(object sender, EventArgs e)
+        {
+            if (radioButtonIntersecting.Checked)
+                _selectedDrawingOption = DrawingOption.Intersecting;
+        }
+
+        private void radioButtonNonIntersecting_CheckedChanged(object sender, EventArgs e)
+        {
+            if (radioButtonNonIntersecting.Checked)
+                _selectedDrawingOption = DrawingOption.NonIntersecting;
+        }
+
+        private void radioButtonEnclosure_CheckedChanged(object sender, EventArgs e)
+        {
+            if (radioButtonEnclosure.Checked)
+                _selectedDrawingOption = DrawingOption.Enclosure;
         }
     }
 }

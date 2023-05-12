@@ -1,10 +1,4 @@
 ﻿using ShapeGenerator.Shapes;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ShapeGenerator
 {
@@ -12,25 +6,19 @@ namespace ShapeGenerator
     {
         public int Compare(Shape x, Shape y)
         {
-            string textX = x.ToString();
-            string textY = y.ToString();
+            var textX = x.ToString();
+            var textY = y.ToString();
+            var partsX = textX.Split(' ');
+            var partsY = textY.Split(' ');
+            var figureX = partsX[0];
+            var figureY = partsY[0];
+            var numberX = int.Parse(partsX[1]);
+            var numberY = int.Parse(partsY[1]);
+            var compareFigure = string.Compare(figureX, figureY, StringComparison.Ordinal);
 
-            // Разделение названия фигуры и номера
-            string[] partsX = textX.Split(' ');
-            string[] partsY = textY.Split(' ');
-
-            string figureX = partsX[0];
-            string figureY = partsY[0];
-
-            int numberX = int.Parse(partsX[1]);
-            int numberY = int.Parse(partsY[1]);
-
-            // Сравнение названия фигуры
-            int compareFigure = string.Compare(figureX, figureY, StringComparison.Ordinal);
             if (compareFigure != 0)
                 return compareFigure;
 
-            // Сравнение номера фигуры
             return numberX.CompareTo(numberY);
         }
     }
