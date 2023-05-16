@@ -44,6 +44,8 @@
             radioButtonIntersecting = new RadioButton();
             radioButtonNonIntersecting = new RadioButton();
             radioButtonEnclosure = new RadioButton();
+            buttonSave = new Button();
+            buttonLoad = new Button();
             ((System.ComponentModel.ISupportInitialize)pictureBox).BeginInit();
             panel.SuspendLayout();
             SuspendLayout();
@@ -220,11 +222,35 @@
             radioButtonEnclosure.UseVisualStyleBackColor = true;
             radioButtonEnclosure.CheckedChanged += radioButtonEnclosure_CheckedChanged;
             // 
+            // buttonSave
+            // 
+            buttonSave.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            buttonSave.Location = new Point(506, 21);
+            buttonSave.Name = "buttonSave";
+            buttonSave.Size = new Size(94, 29);
+            buttonSave.TabIndex = 19;
+            buttonSave.Text = "save";
+            buttonSave.UseVisualStyleBackColor = true;
+            buttonSave.Click += buttonSave_Click;
+            // 
+            // buttonLoad
+            // 
+            buttonLoad.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            buttonLoad.Location = new Point(506, 56);
+            buttonLoad.Name = "buttonLoad";
+            buttonLoad.Size = new Size(94, 29);
+            buttonLoad.TabIndex = 20;
+            buttonLoad.Text = "load";
+            buttonLoad.UseVisualStyleBackColor = true;
+            buttonLoad.Click += buttonLoad_Click;
+            // 
             // MainWindow
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(998, 521);
+            Controls.Add(buttonLoad);
+            Controls.Add(buttonSave);
             Controls.Add(radioButtonEnclosure);
             Controls.Add(radioButtonNonIntersecting);
             Controls.Add(radioButtonIntersecting);
@@ -267,5 +293,7 @@
         private RadioButton radioButtonIntersecting;
         private RadioButton radioButtonNonIntersecting;
         private RadioButton radioButtonEnclosure;
+        private Button buttonSave;
+        private Button buttonLoad;
     }
 }

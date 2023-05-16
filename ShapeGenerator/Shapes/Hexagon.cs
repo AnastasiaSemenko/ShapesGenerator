@@ -4,29 +4,19 @@ namespace ShapeGenerator.Shapes
 {
     public class Hexagon : Shape
     {
-        public Point PointA { get; set; }
-        public Point PointB { get; set; }
-        public Point PointC { get; set; }
-        public Point PointD { get; set; }
-        public Point PointE { get; set; }
-        public Point PointF { get; set; }
-        public int Size { get; }
+        public Hexagon() : base() { }
 
-        public Hexagon(int size)
+        public Hexagon(int size) : base()
         {
             Size = size;
-            Name = $"{FigureShape.Hexagon} {MainWindow.Shapes.Where(x => x.GetType() == typeof(Hexagon)).Count() + 1}";
+            Points = new Point[6];
+            Name = $"{FigureShape.Hexagon} {MainWindow.shapes.Where(x => x.GetType() == typeof(Hexagon)).Count() + 1}";
         }
-        
-        public override void Draw(Graphics graphics)
-        {
-            graphics.DrawPolygon(Pen, new[] { PointA, PointB, PointC, PointD, PointE, PointF} );
-        }
-
+ 
         public override string ToString()
         {
-            return $"{Name} :\n{PointA.X} {PointA.Y} {PointB.X} {PointB.Y} {PointC.X} {PointC.Y} " +
-                $"{PointD.X} {PointD.Y} {PointE.X} {PointE.Y} {PointF.X} {PointF.Y}";
+            return $"{Name} :\n{Points[0].X} {Points[0].Y} {Points[1].X} {Points[1].Y} {Points[2].X} {Points[2].Y} " +
+                $"{Points[3].X} {Points[3].Y} {Points[4].X} {Points[4].Y} {Points[5].X} {Points[5].Y}";
         }
     }
 }

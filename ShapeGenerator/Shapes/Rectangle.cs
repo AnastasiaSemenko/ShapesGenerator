@@ -4,26 +4,19 @@ namespace ShapeGenerator.Shapes
 {
     public class Rectangle : Shape
     {
-        public Point PointA { get; set; }
-        public Point PointB { get; set; }
-        public Point PointC { get; set; }
-        public Point PointD { get; set; }
-        public int Size { get; }
+        public Rectangle() { }
 
-        public Rectangle(int size)
+        public Rectangle(int size) : base()
         {
             Size = size;
-            Name = $"{FigureShape.Rectangle} {MainWindow.Shapes.Where(x => x.GetType() == typeof(Rectangle)).Count() + 1}";
+            Points = new Point[4];
+            Name = $"{FigureShape.Rectangle} {MainWindow.shapes.Where(x => x.GetType() == typeof(Rectangle)).Count() + 1}";
         }
         
-        public override void Draw(Graphics graphics)
-        {
-            graphics.DrawRectangle(Pen, new System.Drawing.Rectangle(PointA.X, PointA.Y, Size * 2, Size));
-        }
-
         public override string ToString()
         {
-            return $"{Name} :\n{PointA.X} {PointA.Y} {PointB.X} {PointB.Y} {PointC.X} {PointC.Y} {PointD.X} {PointD.Y}";
+            return $"{Name} :\n{Points[0].X} {Points[0].Y} {Points[1].X} {Points[1].Y} " +
+                $"{Points[2].X} {Points[2].Y} {Points[3].X} {Points[3].Y}";
         }
     }
 }

@@ -1,4 +1,6 @@
 ﻿using Enums.ShapeGenerator;
+using Newtonsoft.Json;
+using ShapeGenerator.Drawers;
 using ShapeGenerator.Enums;
 using ShapeGenerator.Shapes;
 
@@ -6,16 +8,13 @@ namespace ShapeGenerator
 {
     public partial class MainWindow : Form
     {
-        private static List<Shape> shapes = new();
+        public static List<Shape> shapes = new();
 
         private Button _selectedButton;
         private FigureShape _selectedFigureShape;
         private DrawingOption _selectedDrawingOption;
         private int _from;
         private int _to;
-        private int size = 50; //////////////////////////////////////////////////////////////
-
-        public static List<Shape> Shapes { get => shapes; set => shapes = value; }
 
         public MainWindow()
         {
@@ -30,11 +29,13 @@ namespace ShapeGenerator
         {
             _from = int.Parse(textBoxFrom.Text);
             _to = int.Parse(textBoxTo.Text);
-            Drawer.DrawShapes(_from, _to, _selectedFigureShape, _selectedDrawingOption, pictureBox);
-            Shapes.Sort(new FigureComparer());
+            var shapeDrawer = ShapeDrawer.GetDrawerForShape(_from, _to, _selectedFigureShape,
+                _selectedDrawingOption, pictureBox);
+            shapeDrawer.Draw();
+            shapes.Sort(new FigureComparer());
             listBoxShapesInfo.Items.Clear();
 
-            foreach (var shape in Shapes)
+            foreach (var shape in shapes)
                 listBoxShapesInfo.Items.Add(shape);
         }
 
@@ -42,7 +43,7 @@ namespace ShapeGenerator
         {
             pictureBox.Invalidate();
             listBoxShapesInfo.Items.Clear();
-            Shapes.Clear();
+            shapes.Clear();
             pictureBox.Update();
         }
 
@@ -118,8 +119,8 @@ namespace ShapeGenerator
 
         private void pictureBox1_Paint(object sender, PaintEventArgs e)
         {
-            foreach (var shape in Shapes)
-                shape.Draw(e.Graphics);
+            foreach (var shape in shapes)
+                e.Graphics.DrawPolygon(new Pen(Color.Black, 2), shape.Points);
         }
 
         private void radioButtonIntersecting_CheckedChanged(object sender, EventArgs e)
@@ -138,6 +139,44 @@ namespace ShapeGenerator
         {
             if (radioButtonEnclosure.Checked)
                 _selectedDrawingOption = DrawingOption.Enclosure;
+        }
+
+        private void buttonSave_Click(object sender, EventArgs e)
+        {
+            using (var saveFileDialog = new SaveFileDialog())
+            {
+                saveFileDialog.Title = "Сохранить файл";
+                saveFileDialog.Filter = "JSON файлы (*.json)|*.json";
+
+                if (saveFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    var saveFileName = saveFileDialog.FileName;
+                    var json = JsonConvert.SerializeObject(shapes);
+                    File.WriteAllText(saveFileName, json);
+                }
+            }
+        }
+
+        private void buttonLoad_Click(object sender, EventArgs e)
+        {
+            using (var openFileDialog = new OpenFileDialog())
+            {
+                openFileDialog.Title = "Выберите файл";
+                openFileDialog.Filter = "JSON файлы (*.json)|*.json";
+
+                if (openFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    var selectedFileName = openFileDialog.FileName;
+                    var jsonFromFile = File.ReadAllText(selectedFileName);
+                    shapes = JsonConvert.DeserializeObject<List<Shape>>(jsonFromFile, new ShapesConverter());
+                    pictureBox.Invalidate();
+                    shapes.Sort(new FigureComparer());
+                    listBoxShapesInfo.Items.Clear();
+
+                    foreach (var shape in shapes)
+                        listBoxShapesInfo.Items.Add(shape);
+                }
+            }
         }
     }
 }
