@@ -46,6 +46,7 @@
             radioButtonEnclosure = new RadioButton();
             buttonSave = new Button();
             buttonLoad = new Button();
+            labelMaxNestedLevel = new Label();
             ((System.ComponentModel.ISupportInitialize)pictureBox).BeginInit();
             panel.SuspendLayout();
             SuspendLayout();
@@ -53,7 +54,7 @@
             // buttonGen
             // 
             buttonGen.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            buttonGen.Location = new Point(406, 154);
+            buttonGen.Location = new Point(415, 154);
             buttonGen.Name = "buttonGen";
             buttonGen.Size = new Size(94, 30);
             buttonGen.TabIndex = 0;
@@ -68,17 +69,17 @@
             pictureBox.BorderStyle = BorderStyle.FixedSingle;
             pictureBox.Location = new Point(0, 0);
             pictureBox.Name = "pictureBox";
-            pictureBox.Size = new Size(600, 328);
+            pictureBox.Size = new Size(609, 328);
             pictureBox.SizeMode = PictureBoxSizeMode.AutoSize;
             pictureBox.TabIndex = 1;
             pictureBox.TabStop = false;
-            pictureBox.SizeChanged += pictureBox1_SizeChanged;
-            pictureBox.Paint += pictureBox1_Paint;
+            pictureBox.SizeChanged += pictureBox_SizeChanged;
+            pictureBox.Paint += pictureBox_Paint;
             // 
             // buttonClear
             // 
             buttonClear.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            buttonClear.Location = new Point(506, 154);
+            buttonClear.Location = new Point(515, 154);
             buttonClear.Name = "buttonClear";
             buttonClear.Size = new Size(94, 30);
             buttonClear.TabIndex = 2;
@@ -92,16 +93,16 @@
             listBoxShapesInfo.DrawMode = DrawMode.OwnerDrawVariable;
             listBoxShapesInfo.FormattingEnabled = true;
             listBoxShapesInfo.ItemHeight = 40;
-            listBoxShapesInfo.Location = new Point(606, 0);
+            listBoxShapesInfo.Location = new Point(615, 0);
             listBoxShapesInfo.Name = "listBoxShapesInfo";
-            listBoxShapesInfo.Size = new Size(392, 521);
+            listBoxShapesInfo.Size = new Size(392, 515);
             listBoxShapesInfo.TabIndex = 3;
             listBoxShapesInfo.DrawItem += ListBoxShapesInfo_DrawItem;
             // 
             // label1
             // 
             label1.AutoSize = true;
-            label1.Location = new Point(14, 70);
+            label1.Location = new Point(14, 94);
             label1.Name = "label1";
             label1.Size = new Size(43, 20);
             label1.TabIndex = 4;
@@ -110,7 +111,7 @@
             // label2
             // 
             label2.AutoSize = true;
-            label2.Location = new Point(125, 70);
+            label2.Location = new Point(124, 94);
             label2.Name = "label2";
             label2.Size = new Size(25, 20);
             label2.TabIndex = 5;
@@ -118,7 +119,7 @@
             // 
             // textBoxFrom
             // 
-            textBoxFrom.Location = new Point(64, 68);
+            textBoxFrom.Location = new Point(63, 87);
             textBoxFrom.Name = "textBoxFrom";
             textBoxFrom.Size = new Size(55, 27);
             textBoxFrom.TabIndex = 6;
@@ -127,7 +128,7 @@
             // 
             // textBoxTo
             // 
-            textBoxTo.Location = new Point(156, 68);
+            textBoxTo.Location = new Point(155, 87);
             textBoxTo.Name = "textBoxTo";
             textBoxTo.Size = new Size(63, 27);
             textBoxTo.TabIndex = 7;
@@ -136,41 +137,45 @@
             // 
             // buttonSquare
             // 
-            buttonSquare.Location = new Point(18, 21);
+            buttonSquare.BackgroundImage = Properties.Resources.Square;
+            buttonSquare.BackgroundImageLayout = ImageLayout.Stretch;
+            buttonSquare.Location = new Point(18, 12);
             buttonSquare.Name = "buttonSquare";
-            buttonSquare.Size = new Size(94, 29);
+            buttonSquare.Size = new Size(60, 60);
             buttonSquare.TabIndex = 8;
-            buttonSquare.Text = "square";
             buttonSquare.UseVisualStyleBackColor = true;
             buttonSquare.Click += ButtonSquare_Click;
             // 
             // buttonTriangle
             // 
-            buttonTriangle.Location = new Point(118, 21);
+            buttonTriangle.BackgroundImage = Properties.Resources.Triangle;
+            buttonTriangle.BackgroundImageLayout = ImageLayout.Stretch;
+            buttonTriangle.Location = new Point(97, 12);
             buttonTriangle.Name = "buttonTriangle";
-            buttonTriangle.Size = new Size(94, 29);
+            buttonTriangle.Size = new Size(60, 60);
             buttonTriangle.TabIndex = 9;
-            buttonTriangle.Text = "triangle";
             buttonTriangle.UseVisualStyleBackColor = true;
             buttonTriangle.Click += ButtonTriangle_Click;
             // 
             // buttonRectangle
             // 
-            buttonRectangle.Location = new Point(218, 21);
+            buttonRectangle.BackgroundImage = Properties.Resources.Rectangle;
+            buttonRectangle.BackgroundImageLayout = ImageLayout.Stretch;
+            buttonRectangle.Location = new Point(174, 12);
             buttonRectangle.Name = "buttonRectangle";
-            buttonRectangle.Size = new Size(94, 29);
+            buttonRectangle.Size = new Size(60, 60);
             buttonRectangle.TabIndex = 10;
-            buttonRectangle.Text = "rectangle";
             buttonRectangle.UseVisualStyleBackColor = true;
             buttonRectangle.Click += ButtonRectangle_Click;
             // 
             // buttonHexagon
             // 
-            buttonHexagon.Location = new Point(318, 21);
+            buttonHexagon.BackgroundImage = Properties.Resources.Hexagon;
+            buttonHexagon.BackgroundImageLayout = ImageLayout.Stretch;
+            buttonHexagon.Location = new Point(252, 12);
             buttonHexagon.Name = "buttonHexagon";
-            buttonHexagon.Size = new Size(94, 29);
+            buttonHexagon.Size = new Size(60, 60);
             buttonHexagon.TabIndex = 11;
-            buttonHexagon.Text = "hexagon";
             buttonHexagon.UseVisualStyleBackColor = true;
             buttonHexagon.Click += ButtonHexagon_Click;
             // 
@@ -183,13 +188,13 @@
             panel.Controls.Add(pictureBox);
             panel.Location = new Point(0, 190);
             panel.Name = "panel";
-            panel.Size = new Size(601, 331);
+            panel.Size = new Size(610, 325);
             panel.TabIndex = 12;
             // 
             // radioButtonIntersecting
             // 
             radioButtonIntersecting.AutoSize = true;
-            radioButtonIntersecting.Location = new Point(18, 101);
+            radioButtonIntersecting.Location = new Point(18, 119);
             radioButtonIntersecting.Name = "radioButtonIntersecting";
             radioButtonIntersecting.Size = new Size(107, 24);
             radioButtonIntersecting.TabIndex = 16;
@@ -201,7 +206,7 @@
             // radioButtonNonIntersecting
             // 
             radioButtonNonIntersecting.AutoSize = true;
-            radioButtonNonIntersecting.Location = new Point(18, 131);
+            radioButtonNonIntersecting.Location = new Point(18, 140);
             radioButtonNonIntersecting.Name = "radioButtonNonIntersecting";
             radioButtonNonIntersecting.Size = new Size(139, 24);
             radioButtonNonIntersecting.TabIndex = 17;
@@ -225,7 +230,7 @@
             // buttonSave
             // 
             buttonSave.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            buttonSave.Location = new Point(506, 21);
+            buttonSave.Location = new Point(515, 21);
             buttonSave.Name = "buttonSave";
             buttonSave.Size = new Size(94, 29);
             buttonSave.TabIndex = 19;
@@ -236,7 +241,7 @@
             // buttonLoad
             // 
             buttonLoad.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            buttonLoad.Location = new Point(506, 56);
+            buttonLoad.Location = new Point(515, 56);
             buttonLoad.Name = "buttonLoad";
             buttonLoad.Size = new Size(94, 29);
             buttonLoad.TabIndex = 20;
@@ -244,11 +249,24 @@
             buttonLoad.UseVisualStyleBackColor = true;
             buttonLoad.Click += buttonLoad_Click;
             // 
+            // labelMaxNestedLevel
+            // 
+            labelMaxNestedLevel.AutoSize = true;
+            labelMaxNestedLevel.Font = new Font("Segoe UI Semibold", 9F, FontStyle.Bold, GraphicsUnit.Point);
+            labelMaxNestedLevel.ForeColor = Color.Teal;
+            labelMaxNestedLevel.Location = new Point(174, 167);
+            labelMaxNestedLevel.Name = "labelMaxNestedLevel";
+            labelMaxNestedLevel.Size = new Size(138, 20);
+            labelMaxNestedLevel.TabIndex = 21;
+            labelMaxNestedLevel.Text = "Max nested level - ";
+            labelMaxNestedLevel.Visible = false;
+            // 
             // MainWindow
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(998, 521);
+            ClientSize = new Size(1007, 515);
+            Controls.Add(labelMaxNestedLevel);
             Controls.Add(buttonLoad);
             Controls.Add(buttonSave);
             Controls.Add(radioButtonEnclosure);
@@ -295,5 +313,6 @@
         private RadioButton radioButtonEnclosure;
         private Button buttonSave;
         private Button buttonLoad;
+        private Label labelMaxNestedLevel;
     }
 }

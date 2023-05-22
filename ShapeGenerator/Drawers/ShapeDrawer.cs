@@ -1,41 +1,38 @@
-﻿using Enums.ShapeGenerator;
-using ShapeGenerator.Enums;
+﻿using ShapeGenerator.Enums;
 using ShapeGenerator.Shapes;
-using System.Diagnostics;
 
 namespace ShapeGenerator.Drawers
 {
     public abstract class ShapeDrawer
     {
-        protected static PictureBox _pictureBox;
-        protected static int _count;
-        protected static int _size;
-        protected static Random _random = new Random();
-        protected static DrawingOption _drawingOption;
+        protected PictureBox _pictureBox;
+        protected int _size;
+        protected DrawingOption _drawingOption;
+        protected Random _random = new();
 
-        public abstract void Draw();
-
-        public static ShapeDrawer GetDrawerForShape(int from, int to, FigureShape figureShape,
-            DrawingOption drawingOption, PictureBox pictureBox)
+        public ShapeDrawer(PictureBox pictureBox, DrawingOption drawingOption)
         {
-            _drawingOption = drawingOption;
-            _count = _random.Next(from, to);
             _pictureBox = pictureBox;
+            _drawingOption = drawingOption;
+        }
 
-            switch (figureShape)
+        public abstract Shape Draw(List<Shape> shapes);
+
+        protected Point GetCenterPoint(Shape shape) 
+        {
+            int sumX = 0;
+            int sumY = 0;
+
+            foreach (Point vertex in shape.Points)
             {
-                case FigureShape.Square:
-                    return new SquareDrawer();
-                case FigureShape.Rectangle:
-                    return new RectangleDrawer();
-                case FigureShape.Hexagon:
-                    return new HexagonDrawer();
-                case FigureShape.Triangle:
-                    return new TriangleDrawer();
-                default:
-                    Debug.WriteLine("Attempt to draw shapes of unknown type");
-                    return null;
+                sumX += vertex.X;
+                sumY += vertex.Y;
             }
+
+            int centerX = sumX / shape.Points.Length;
+            int centerY = sumY / shape.Points.Length;
+
+            return new Point(centerX, centerY);
         }
 
         protected bool Intersection(Point pointA1, Point pointA2, Point pointB1, Point pointB2)
@@ -74,9 +71,9 @@ namespace ShapeGenerator.Drawers
             return false;
         }
 
-        protected bool CheckShapeIntersection(Shape shape)
+        protected bool CheckShapeIntersection(Shape shape, List<Shape> shapes)
         {
-            foreach (var otherShape in MainWindow.shapes)
+            foreach (var otherShape in shapes)
             {
                 for (var i = 0; i < shape.Points.Length; i++)
                 {
