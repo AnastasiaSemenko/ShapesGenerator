@@ -2,7 +2,6 @@
 using Newtonsoft.Json;
 using ShapeGenerator.Enums;
 using ShapeGenerator.Shapes;
-using System.Diagnostics;
 
 namespace ShapeGenerator
 {
@@ -15,7 +14,7 @@ namespace ShapeGenerator
         public MainWindow()
         {
             InitializeComponent();
-            this.MinimumSize = new Size(1050, 550);
+            MinimumSize = new Size(1050, 550);
             _drawerController = new DrawerController(pictureBox);
             WindowState = FormWindowState.Maximized;
             UpdateSelectedButton(buttonSquare);
@@ -53,16 +52,18 @@ namespace ShapeGenerator
 
             if (_drawerController.DrawingOption == DrawingOption.Enclosure)
             {
-                labelMaxNestedLevel.Text = "Max nested level - " + _drawerController.GetMaxNestingLevel();
-                labelMaxNestedLevel.Visible = true;
+                labelMaxNestingLevel.Text = "Max nesting level - " + _drawerController.GetMaxNestingLevel();
+                labelMaxNestingLevel.Visible = true;
             }
+            else
+                labelMaxNestingLevel.Visible = false;
 
             Cursor = Cursors.Default;
         }
 
         private void ButtonClear_Click(object sender, EventArgs e)
         {
-            labelMaxNestedLevel.Visible = false;
+            labelMaxNestingLevel.Visible = false;
             _selectedShape = null;
             _drawerController.ClearShapes();
             listBoxShapesInfo.Items.Clear();

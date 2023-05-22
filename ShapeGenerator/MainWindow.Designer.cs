@@ -46,7 +46,7 @@
             radioButtonEnclosure = new RadioButton();
             buttonSave = new Button();
             buttonLoad = new Button();
-            labelMaxNestedLevel = new Label();
+            labelMaxNestingLevel = new Label();
             ((System.ComponentModel.ISupportInitialize)pictureBox).BeginInit();
             panel.SuspendLayout();
             SuspendLayout();
@@ -249,24 +249,24 @@
             buttonLoad.UseVisualStyleBackColor = true;
             buttonLoad.Click += buttonLoad_Click;
             // 
-            // labelMaxNestedLevel
+            // labelMaxNestingLevel
             // 
-            labelMaxNestedLevel.AutoSize = true;
-            labelMaxNestedLevel.Font = new Font("Segoe UI Semibold", 9F, FontStyle.Bold, GraphicsUnit.Point);
-            labelMaxNestedLevel.ForeColor = Color.Teal;
-            labelMaxNestedLevel.Location = new Point(174, 167);
-            labelMaxNestedLevel.Name = "labelMaxNestedLevel";
-            labelMaxNestedLevel.Size = new Size(138, 20);
-            labelMaxNestedLevel.TabIndex = 21;
-            labelMaxNestedLevel.Text = "Max nested level - ";
-            labelMaxNestedLevel.Visible = false;
+            labelMaxNestingLevel.AutoSize = true;
+            labelMaxNestingLevel.Font = new Font("Segoe UI Semibold", 9F, FontStyle.Bold, GraphicsUnit.Point);
+            labelMaxNestingLevel.ForeColor = Color.Teal;
+            labelMaxNestingLevel.Location = new Point(174, 167);
+            labelMaxNestingLevel.Name = "labelMaxNestingLevel";
+            labelMaxNestingLevel.Size = new Size(143, 20);
+            labelMaxNestingLevel.TabIndex = 21;
+            labelMaxNestingLevel.Text = "Max nesting level - ";
+            labelMaxNestingLevel.Visible = false;
             // 
             // MainWindow
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1007, 515);
-            Controls.Add(labelMaxNestedLevel);
+            Controls.Add(labelMaxNestingLevel);
             Controls.Add(buttonLoad);
             Controls.Add(buttonSave);
             Controls.Add(radioButtonEnclosure);
@@ -313,6 +313,6 @@
         private RadioButton radioButtonEnclosure;
         private Button buttonSave;
         private Button buttonLoad;
-        private Label labelMaxNestedLevel;
+        private Label labelMaxNestingLevel;
     }
 }
