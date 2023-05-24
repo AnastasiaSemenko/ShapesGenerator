@@ -2,6 +2,8 @@
 using Newtonsoft.Json;
 using ShapeGenerator.Enums;
 using ShapeGenerator.Shapes;
+using static System.Net.Mime.MediaTypeNames;
+using System.Drawing;
 
 namespace ShapeGenerator
 {
@@ -20,6 +22,8 @@ namespace ShapeGenerator
             UpdateSelectedButton(buttonSquare);
             _drawerController.FigureShape = FigureShape.Square;
             radioButtonIntersecting.Checked = true;
+            splitContainer1.Panel2MinSize = listBoxShapesInfo.Width;
+            listBoxShapesInfo.ItemHeight = listBoxShapesInfo.Font.Height * 2;
         }
 
         private void ButtonGen_Click(object sender, EventArgs e)
@@ -72,12 +76,15 @@ namespace ShapeGenerator
 
         private void ListBoxShapesInfo_DrawItem(object sender, DrawItemEventArgs e)
         {
-            e.DrawBackground();
+            /*e.DrawBackground();
 
             if (e.Index >= 0)
             {
                 var text = listBoxShapesInfo.Items[e.Index].ToString();
+                var textSize = e.Graphics.MeasureString(text, listBoxShapesInfo.Font);
+                listBoxShapesInfo.HorizontalExtent = (int)Math.Ceiling(textSize.Width);
                 var rect1 = new System.Drawing.Rectangle(e.Bounds.X, e.Bounds.Y, e.Bounds.Width, listBoxShapesInfo.ItemHeight);
+                e.Graphics.SetClip(rect1);
                 e.Graphics.DrawString(text, listBoxShapesInfo.Font, Brushes.Black, rect1);
 
                 if ((e.State & DrawItemState.Selected) == DrawItemState.Selected)
@@ -87,7 +94,78 @@ namespace ShapeGenerator
                     _selectedShape = _drawerController.GetSelectedShape(name);
                     pictureBox.Invalidate();
                 }
+
+                e.Graphics.ResetClip();
+            }*/
+
+
+            e.DrawBackground();
+
+            if (e.Index >= 0)
+            {
+                var text = listBoxShapesInfo.Items[e.Index].ToString();
+                var textSize = e.Graphics.MeasureString(text, listBoxShapesInfo.Font);
+                var rect1 = new System.Drawing.Rectangle(e.Bounds.X, e.Bounds.Y, e.Bounds.Width, listBoxShapesInfo.ItemHeight);
+
+                using (var clippedRegion = new Region(rect1))
+                {
+                    e.Graphics.Clip = clippedRegion;
+                    e.Graphics.DrawString(text, listBoxShapesInfo.Font, Brushes.Black, rect1);
+                }
+
+                if ((e.State & DrawItemState.Selected) == DrawItemState.Selected)
+                {
+                    e.DrawFocusRectangle();
+                    var name = text.Split('\n')[0];
+                    _selectedShape = _drawerController.GetSelectedShape(name);
+                    pictureBox.Invalidate();
+                }
+
+                e.Graphics.ResetClip();
             }
+
+            /*e.DrawBackground();
+
+            if (e.Index >= 0)
+            {
+                var text = listBoxShapesInfo.Items[e.Index].ToString();
+                var textSize = e.Graphics.MeasureString(text, listBoxShapesInfo.Font);
+                var rect1 = new System.Drawing.Rectangle(e.Bounds.X, e.Bounds.Y, e.Bounds.Width, listBoxShapesInfo.ItemHeight);
+
+                // Проверяем, выходит ли текст за пределы элемента
+                bool isTextClipped = textSize.Width > e.Bounds.Width;
+
+                // Если текст выходит за пределы элемента, устанавливаем горизонтальную полосу прокрутки
+                if (isTextClipped)
+                {
+                    listBoxShapesInfo.HorizontalScrollbar = true;
+                    listBoxShapesInfo.HorizontalExtent = (int)Math.Ceiling(textSize.Width);
+                }
+                else
+                {
+                    listBoxShapesInfo.HorizontalScrollbar = false;
+                }
+
+                using (var clippedRegion = new Region(rect1))
+                {
+                    e.Graphics.Clip = clippedRegion;
+                    e.Graphics.DrawString(text, listBoxShapesInfo.Font, Brushes.Black, rect1);
+                }
+
+                if ((e.State & DrawItemState.Selected) == DrawItemState.Selected)
+                {
+                    e.DrawFocusRectangle();
+                    var name = text.Split('\n')[0];
+                    _selectedShape = _drawerController.GetSelectedShape(name);
+                    pictureBox.Invalidate();
+                }
+
+                e.Graphics.ResetClip();
+            }*/
+
+
+
+
         }
 
         private void TextBoxFrom_KeyPress(object sender, KeyPressEventArgs e)
@@ -138,11 +216,6 @@ namespace ShapeGenerator
             _selectedButton = newSelectedButton;
             _selectedButton.BackColor = Color.Blue;
             _selectedButton.ForeColor = Color.White;
-        }
-
-        private void pictureBox_SizeChanged(object sender, EventArgs e)
-        {
-            panel.AutoScrollMinSize = pictureBox.Size;
         }
 
         private void pictureBox_Paint(object sender, PaintEventArgs e)
@@ -232,6 +305,16 @@ namespace ShapeGenerator
 
         private void UpdateListBoxShapesItems()
         {
+            listBoxShapesInfo.HorizontalExtent = 0;
+
+            foreach (var shape in _drawerController.Shapes)
+            {
+                var textLength = (int)(TextRenderer.MeasureText(shape.ToString().Split("\n")[1], listBoxShapesInfo.Font).Width * 1.05);
+
+                if (textLength > listBoxShapesInfo.HorizontalExtent)
+                    listBoxShapesInfo.HorizontalExtent = textLength;
+            }
+
             listBoxShapesInfo.Items.Clear();
 
             foreach (var shape in _drawerController.Shapes)
@@ -246,6 +329,15 @@ namespace ShapeGenerator
         private void ShowWarningMessageBox(string message)
         {
             MessageBox.Show(message, "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+        }
+
+        private void MainWindow_Resize(object sender, EventArgs e)
+        {
+            var verticalScrollBarWidth = SystemInformation.VerticalScrollBarWidth;
+            var horizontalScrollBarHeight = SystemInformation.HorizontalScrollBarHeight;
+            panel.AutoScrollMinSize = pictureBox.Size - new Size(verticalScrollBarWidth, horizontalScrollBarHeight);
+            splitContainer1.Panel1MinSize = (int)(Width * 0.65);
+            splitContainer1.PerformLayout();
         }
     }
 }
