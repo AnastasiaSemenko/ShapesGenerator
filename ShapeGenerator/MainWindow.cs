@@ -1,9 +1,8 @@
 ﻿using Enums.ShapeGenerator;
 using Newtonsoft.Json;
 using ShapeGenerator.Enums;
+using ShapeGenerator.Exceptions;
 using ShapeGenerator.Shapes;
-using static System.Net.Mime.MediaTypeNames;
-using System.Drawing;
 
 namespace ShapeGenerator
 {
@@ -29,6 +28,13 @@ namespace ShapeGenerator
         private void ButtonGen_Click(object sender, EventArgs e)
         {
             _selectedShape = null;
+
+            if (string.IsNullOrEmpty(textBoxFrom.Text) || string.IsNullOrEmpty(textBoxTo.Text))
+            {
+                ShowWarningMessageBox("The 'from' and 'to' fields must be filled in.");
+                return;
+            }
+
             var from = int.Parse(textBoxFrom.Text);
             var to = int.Parse(textBoxTo.Text);
 
@@ -38,9 +44,9 @@ namespace ShapeGenerator
                 return;
             }
 
-            Cursor = Cursors.WaitCursor;
             _drawerController.From = int.Parse(textBoxFrom.Text);
             _drawerController.To = int.Parse(textBoxTo.Text);
+            Cursor = Cursors.WaitCursor;
 
             try
             {
@@ -76,35 +82,11 @@ namespace ShapeGenerator
 
         private void ListBoxShapesInfo_DrawItem(object sender, DrawItemEventArgs e)
         {
-            /*e.DrawBackground();
-
-            if (e.Index >= 0)
-            {
-                var text = listBoxShapesInfo.Items[e.Index].ToString();
-                var textSize = e.Graphics.MeasureString(text, listBoxShapesInfo.Font);
-                listBoxShapesInfo.HorizontalExtent = (int)Math.Ceiling(textSize.Width);
-                var rect1 = new System.Drawing.Rectangle(e.Bounds.X, e.Bounds.Y, e.Bounds.Width, listBoxShapesInfo.ItemHeight);
-                e.Graphics.SetClip(rect1);
-                e.Graphics.DrawString(text, listBoxShapesInfo.Font, Brushes.Black, rect1);
-
-                if ((e.State & DrawItemState.Selected) == DrawItemState.Selected)
-                {
-                    e.DrawFocusRectangle();
-                    var name = text.Split('\n')[0];
-                    _selectedShape = _drawerController.GetSelectedShape(name);
-                    pictureBox.Invalidate();
-                }
-
-                e.Graphics.ResetClip();
-            }*/
-
-
             e.DrawBackground();
 
             if (e.Index >= 0)
             {
                 var text = listBoxShapesInfo.Items[e.Index].ToString();
-                var textSize = e.Graphics.MeasureString(text, listBoxShapesInfo.Font);
                 var rect1 = new System.Drawing.Rectangle(e.Bounds.X, e.Bounds.Y, e.Bounds.Width, listBoxShapesInfo.ItemHeight);
 
                 using (var clippedRegion = new Region(rect1))
@@ -123,49 +105,6 @@ namespace ShapeGenerator
 
                 e.Graphics.ResetClip();
             }
-
-            /*e.DrawBackground();
-
-            if (e.Index >= 0)
-            {
-                var text = listBoxShapesInfo.Items[e.Index].ToString();
-                var textSize = e.Graphics.MeasureString(text, listBoxShapesInfo.Font);
-                var rect1 = new System.Drawing.Rectangle(e.Bounds.X, e.Bounds.Y, e.Bounds.Width, listBoxShapesInfo.ItemHeight);
-
-                // Проверяем, выходит ли текст за пределы элемента
-                bool isTextClipped = textSize.Width > e.Bounds.Width;
-
-                // Если текст выходит за пределы элемента, устанавливаем горизонтальную полосу прокрутки
-                if (isTextClipped)
-                {
-                    listBoxShapesInfo.HorizontalScrollbar = true;
-                    listBoxShapesInfo.HorizontalExtent = (int)Math.Ceiling(textSize.Width);
-                }
-                else
-                {
-                    listBoxShapesInfo.HorizontalScrollbar = false;
-                }
-
-                using (var clippedRegion = new Region(rect1))
-                {
-                    e.Graphics.Clip = clippedRegion;
-                    e.Graphics.DrawString(text, listBoxShapesInfo.Font, Brushes.Black, rect1);
-                }
-
-                if ((e.State & DrawItemState.Selected) == DrawItemState.Selected)
-                {
-                    e.DrawFocusRectangle();
-                    var name = text.Split('\n')[0];
-                    _selectedShape = _drawerController.GetSelectedShape(name);
-                    pictureBox.Invalidate();
-                }
-
-                e.Graphics.ResetClip();
-            }*/
-
-
-
-
         }
 
         private void TextBoxFrom_KeyPress(object sender, KeyPressEventArgs e)
@@ -178,7 +117,6 @@ namespace ShapeGenerator
         {
             if (!char.IsDigit(e.KeyChar) && e.KeyChar != '\b')
                 e.Handled = true;
-
         }
 
         private void ButtonSquare_Click(object sender, EventArgs e)
@@ -252,53 +190,53 @@ namespace ShapeGenerator
 
         private void buttonSave_Click(object sender, EventArgs e)
         {
-            using (var saveFileDialog = new SaveFileDialog())
-            {
-                saveFileDialog.Title = "Сохранить файл";
-                saveFileDialog.Filter = "JSON файлы (*.json)|*.json";
-                saveFileDialog.FileName = "shapes.json";
+            using var saveFileDialog = new SaveFileDialog();
+            saveFileDialog.Title = "Сохранить файл";
+            saveFileDialog.Filter = "JSON файлы (*.json)|*.json";
+            saveFileDialog.FileName = "shapes.json";
 
-                if (saveFileDialog.ShowDialog() == DialogResult.OK)
+            if (saveFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                try
                 {
-                    try
-                    {
-                        _drawerController.SaveShapes(saveFileDialog);
-                    }
-                    catch (IOException _)
-                    {
-                        ShowErrorMessageBox("File writing error.");
-                    }
-                    catch (JsonException _)
-                    {
-                        ShowErrorMessageBox("JSON serialization error.");
-                    }
+                    _drawerController.SaveShapes(saveFileDialog);
+                }
+                catch (IOException _)
+                {
+                    ShowErrorMessageBox("File writing error.");
+                }
+                catch (JsonException _)
+                {
+                    ShowErrorMessageBox("JSON serialization error.");
                 }
             }
         }
 
         private void buttonLoad_Click(object sender, EventArgs e)
         {
-            using (var openFileDialog = new OpenFileDialog())
-            {
-                openFileDialog.Title = "Выберите файл";
-                openFileDialog.Filter = "JSON файлы (*.json)|*.json";
+            using var openFileDialog = new OpenFileDialog();
+            openFileDialog.Title = "Выберите файл";
+            openFileDialog.Filter = "JSON файлы (*.json)|*.json";
 
-                if (openFileDialog.ShowDialog() == DialogResult.OK)
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                try
                 {
-                    try
-                    {
-                        _drawerController.LoadShapes(openFileDialog);
-                        pictureBox.Invalidate();
-                        UpdateListBoxShapesItems();
-                    }
-                    catch (IOException _)
-                    {
-                        ShowErrorMessageBox("File reading error.");
-                    }
-                    catch (JsonException _)
-                    {
-                        ShowErrorMessageBox("JSON deserialization error.");
-                    }
+                    _drawerController.LoadShapes(openFileDialog);
+                    pictureBox.Invalidate();
+                    UpdateListBoxShapesItems();
+                }
+                catch (IOException _)
+                {
+                    ShowErrorMessageBox("File reading error.");
+                }
+                catch (JsonException _)
+                {
+                    ShowErrorMessageBox("JSON deserialization error.");
+                }
+                catch (JsonValidationException ex)
+                {
+                    ShowErrorMessageBox(ex.Message);
                 }
             }
         }
@@ -321,12 +259,12 @@ namespace ShapeGenerator
                 listBoxShapesInfo.Items.Add(shape);
         }
 
-        private void ShowErrorMessageBox(string message)
+        public static void ShowErrorMessageBox(string message)
         {
             MessageBox.Show(message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
 
-        private void ShowWarningMessageBox(string message)
+        public static void ShowWarningMessageBox(string message)
         {
             MessageBox.Show(message, "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
         }

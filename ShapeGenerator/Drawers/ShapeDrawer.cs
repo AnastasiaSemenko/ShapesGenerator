@@ -18,7 +18,7 @@ namespace ShapeGenerator.Drawers
 
         public abstract Shape Draw(List<Shape> shapes);
 
-        protected Point GetCenterPoint(Shape shape) 
+        public static Point GetCenterPoint(Shape shape) 
         {
             int sumX = 0;
             int sumY = 0;

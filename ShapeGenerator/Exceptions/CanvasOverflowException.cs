@@ -1,4 +1,4 @@
-﻿namespace ShapeGenerator
+﻿namespace ShapeGenerator.Exceptions
 {
     public class CanvasOverflowException : Exception
     {

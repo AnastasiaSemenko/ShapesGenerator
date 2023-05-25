@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using ShapeGenerator.Drawers;
 using ShapeGenerator.Enums;
+using ShapeGenerator.Exceptions;
 using ShapeGenerator.Shapes;
 using System.Diagnostics;
 
@@ -32,7 +33,7 @@ namespace ShapeGenerator
 
         public void DrawShapes()
         {
-            var count = _random.Next(From, To);
+            var count = _random.Next(From, To + 1);
             var drawer = GetDrawerForShape();
 
             try
@@ -57,48 +58,33 @@ namespace ShapeGenerator
 
         public void SaveShapes(SaveFileDialog saveFileDialog)
         {
-            try
-            {
-                var json = JsonConvert.SerializeObject(Shapes, _settings);
-                File.WriteAllText(saveFileDialog.FileName, json);
-            }
-            catch (IOException ex)
-            {
-                throw ex;
-            }
-            catch (JsonException ex)
-            {
-                throw ex;
-            }
+            var json = JsonConvert.SerializeObject(Shapes, _settings);
+            File.WriteAllText(saveFileDialog.FileName, json);
         }
 
         public void LoadShapes(OpenFileDialog openFileDialog)
         {
-            try
-            {
-                var selectedFileName = openFileDialog.FileName;
-                var jsonFromFile = File.ReadAllText(selectedFileName);
-                var deserializedShapes = JsonConvert.DeserializeObject<List<Shape>>(jsonFromFile, _settings);
-                Shapes = deserializedShapes;
-            }
-            catch (IOException ex)
-            {
-                throw ex;
-            }
-            catch (JsonException ex)
-            {
-                throw ex;
-            }
-            
+            var selectedFileName = openFileDialog.FileName;
+            var jsonFromFile = File.ReadAllText(selectedFileName);
+            var deserializedShapes = JsonConvert.DeserializeObject<List<Shape>>(jsonFromFile, _settings);
+
+            if (deserializedShapes == null)
+                throw new JsonValidationException("File is Empty");
+
+            foreach (var shape in deserializedShapes)
+                if (!shape.CalculatePoints().SequenceEqual(shape.Points))
+                    throw new JsonValidationException("Invalid Json file.");
+
+            Shapes = deserializedShapes;
             Shapes.Sort(new FigureComparer());
         }
 
         public void DrawNameForShape(Shape shape, Graphics g)
         {
-            
-            Font font = new Font("Arial", 12, FontStyle.Bold);
-            SizeF textSize = g.MeasureString($"{shape.Name} {shape.Id}", font);
-            g.DrawString($"{shape.Name} {shape.Id}", font, Brushes.Black, shape.Center.X - (textSize.Width / 2), shape.Center.Y - (textSize.Height / 2));
+            var font = new Font("Arial", 12, FontStyle.Bold);
+            var textSize = g.MeasureString($"{shape.Name} {shape.Id}", font);
+            var center = ShapeDrawer.GetCenterPoint(shape);
+            g.DrawString($"{shape.Name} {shape.Id}", font, Brushes.Black, center.X - (textSize.Width / 2), center.Y - (textSize.Height / 2));
         }
 
         public Shape GetSelectedShape(string str)

@@ -113,6 +113,7 @@
             // textBoxFrom
             // 
             textBoxFrom.Location = new Point(63, 87);
+            textBoxFrom.MaxLength = 3;
             textBoxFrom.Name = "textBoxFrom";
             textBoxFrom.Size = new Size(55, 27);
             textBoxFrom.TabIndex = 6;
@@ -122,6 +123,7 @@
             // textBoxTo
             // 
             textBoxTo.Location = new Point(155, 87);
+            textBoxTo.MaxLength = 3;
             textBoxTo.Name = "textBoxTo";
             textBoxTo.Size = new Size(63, 27);
             textBoxTo.TabIndex = 7;

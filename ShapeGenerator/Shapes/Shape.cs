@@ -4,12 +4,13 @@ namespace ShapeGenerator.Shapes
 {
     public abstract class Shape
     {
+        public Point StartPoint { get; set; }
         public int Id { get; set; }
         public string Name { get; set; }
         public Point[] Points { get; set; }
-        public Point Center { get; set; }
         public int Size { get; set; }
 
+        public abstract Point[] CalculatePoints();
         public override string ToString()
         {
             var resultValue = new StringBuilder();

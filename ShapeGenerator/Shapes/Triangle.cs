@@ -8,18 +8,24 @@ namespace ShapeGenerator.Shapes
 
         public Triangle() : base() { }
 
-        public Triangle(int size) : base()
+        public Triangle(int size, Point startPoint) : base()
         {
             counter++;
             Id = counter;
+            StartPoint = startPoint;
             Size = size;
-            Points = new Point[3];
             Name = $"{FigureShape.Triangle}";
+            Points = CalculatePoints();
         }
 
-        public override string ToString()
+        public override Point[] CalculatePoints()
         {
-            return base.ToString();
+            var points = new Point[] {
+                new Point(StartPoint.X + Size / 2, StartPoint.Y),
+                new Point(StartPoint.X, StartPoint.Y + Size),
+                new Point(StartPoint.X + Size, StartPoint.Y + Size) };
+            
+            return points;
         }
     }
 }
