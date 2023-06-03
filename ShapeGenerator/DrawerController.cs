@@ -12,7 +12,6 @@ namespace ShapeGenerator
     {
         private PictureBox _pictureBox;
         private Random _random = new();
-        private JsonSerializerSettings _settings;
 
         public FigureShape FigureShape { get; set; }
         public DrawingOption DrawingOption { get; set; }
@@ -24,14 +23,9 @@ namespace ShapeGenerator
         {
             Shapes = new List<Shape>();
             _pictureBox = pictureBox;
-            _settings = new JsonSerializerSettings
-            {
-                TypeNameHandling = TypeNameHandling.All,
-                TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Full
-            };
         }
 
-        public void DrawShapes()
+        public void GenerateShapes()
         {
             var count = _random.Next(From, To + 1);
             var drawer = GetDrawerForShape();
@@ -48,35 +42,6 @@ namespace ShapeGenerator
             {
                 Shapes.Sort(new FigureComparer());
             }
-        }
-
-        public void ClearShapes()
-        {
-            Shapes.Clear();
-            ResetShapesCounter();
-        }
-
-        public void SaveShapes(SaveFileDialog saveFileDialog)
-        {
-            var json = JsonConvert.SerializeObject(Shapes, _settings);
-            File.WriteAllText(saveFileDialog.FileName, json);
-        }
-
-        public void LoadShapes(OpenFileDialog openFileDialog)
-        {
-            var selectedFileName = openFileDialog.FileName;
-            var jsonFromFile = File.ReadAllText(selectedFileName);
-            var deserializedShapes = JsonConvert.DeserializeObject<List<Shape>>(jsonFromFile, _settings);
-
-            if (deserializedShapes == null)
-                throw new JsonValidationException("File is Empty");
-
-            foreach (var shape in deserializedShapes)
-                if (!shape.CalculatePoints().SequenceEqual(shape.Points))
-                    throw new JsonValidationException("Invalid Json file.");
-
-            Shapes = deserializedShapes;
-            Shapes.Sort(new FigureComparer());
         }
 
         public void DrawNameForShape(Shape shape, Graphics g)
@@ -116,14 +81,6 @@ namespace ShapeGenerator
                     Debug.WriteLine("Attempt to draw shapes of unknown type");
                     return null;
             }
-        }
-
-        private void ResetShapesCounter()
-        {
-            Hexagon.counter = 0;
-            Triangle.counter = 0;
-            ShapeGenerator.Shapes.Rectangle.counter = 0;
-            Square.counter = 0;
         }
     }
 }

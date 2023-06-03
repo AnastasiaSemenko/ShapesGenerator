@@ -4,14 +4,10 @@ namespace ShapeGenerator.Shapes
 {
     public class Square : Shape
     {
-        public static int counter = 0;
-
         public Square() : base() { }
 
         public Square(int size, Point startPoint) : base()
         {
-            counter++;
-            Id = counter;
             StartPoint = startPoint;
             Size = size;
             Name = $"{FigureShape.Square}";

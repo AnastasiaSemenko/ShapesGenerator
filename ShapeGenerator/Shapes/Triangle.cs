@@ -10,8 +10,6 @@ namespace ShapeGenerator.Shapes
 
         public Triangle(int size, Point startPoint) : base()
         {
-            counter++;
-            Id = counter;
             StartPoint = startPoint;
             Size = size;
             Name = $"{FigureShape.Triangle}";

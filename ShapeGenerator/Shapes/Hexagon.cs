@@ -4,15 +4,11 @@ namespace ShapeGenerator.Shapes
 {
     public class Hexagon : Shape
     {
-        public static int counter = 0;
-
         public Hexagon() : base() { }
 
         public Hexagon(int size, Point startPoint) : base()
         {
             StartPoint = startPoint;
-            counter++;
-            Id = counter;
             Size = size;
             Name = $"{FigureShape.Hexagon}";
             Points = CalculatePoints();

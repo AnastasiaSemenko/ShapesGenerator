@@ -50,7 +50,7 @@ namespace ShapeGenerator
 
             try
             {
-                _drawerController.DrawShapes();
+                _drawerController.GenerateShapes();
             }
             catch (CanvasOverflowException ex)
             {
@@ -75,7 +75,7 @@ namespace ShapeGenerator
         {
             labelMaxNestingLevel.Visible = false;
             _selectedShape = null;
-            _drawerController.ClearShapes();
+            _drawerController.Shapes.Clear();
             listBoxShapesInfo.Items.Clear();
             pictureBox.Invalidate();
         }
@@ -199,7 +199,7 @@ namespace ShapeGenerator
             {
                 try
                 {
-                    _drawerController.SaveShapes(saveFileDialog);
+                    ShapesLoader.SaveShapes(_drawerController.Shapes, saveFileDialog.FileName);
                 }
                 catch (IOException _)
                 {
@@ -222,7 +222,9 @@ namespace ShapeGenerator
             {
                 try
                 {
-                    _drawerController.LoadShapes(openFileDialog);
+                    var deserializedShapes = ShapesLoader.LoadShapes(openFileDialog.FileName);
+                    _drawerController.Shapes = deserializedShapes;
+                    _drawerController.Shapes.Sort(new FigureComparer());
                     pictureBox.Invalidate();
                     UpdateListBoxShapesItems();
                 }

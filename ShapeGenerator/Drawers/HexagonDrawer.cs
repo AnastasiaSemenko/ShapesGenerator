@@ -1,7 +1,10 @@
 ﻿using ShapeGenerator.Enums;
 using ShapeGenerator.Exceptions;
 using ShapeGenerator.Shapes;
+using System.Collections.Generic;
+using System;
 using System.Diagnostics;
+using System.Windows.Forms;
 
 namespace ShapeGenerator.Drawers
 {
@@ -19,26 +22,23 @@ namespace ShapeGenerator.Drawers
             var maxY = _pictureBox.Height - _size * 2;
             var point = new Point(_random.Next(maxX), _random.Next(maxY));
             var hexagon = new Hexagon(_size, point);
-            var stopwatch = new Stopwatch();
-            stopwatch.Start();
+            var attempts = 0;
 
             if (_drawingOption != DrawingOption.Intersecting)
             {
                 while (CheckShapeIntersection(hexagon, shapes))
                 {
-                    if (stopwatch.ElapsedMilliseconds > 2500)
-                    {
-                        stopwatch.Stop();
-                        Hexagon.counter--;
+                    attempts++;
+
+                    if (attempts > maxAttempts)
                         throw new CanvasOverflowException("There was no place for a new figure on the canvas.");
-                    }
 
                     hexagon.StartPoint = new Point(_random.Next(maxX), _random.Next(maxY));
                     hexagon.Points = hexagon.CalculatePoints();
                 }
             }
 
-            stopwatch.Stop();
+            hexagon.Id = shapes.Count(x => x.GetType() == typeof(Hexagon)) + 1;
             return hexagon;
         }
     }

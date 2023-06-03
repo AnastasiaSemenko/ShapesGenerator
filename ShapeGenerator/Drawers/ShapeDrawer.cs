@@ -10,6 +10,8 @@ namespace ShapeGenerator.Drawers
         protected DrawingOption _drawingOption;
         protected Random _random = new();
 
+        protected static int maxAttempts = 1000;
+
         public ShapeDrawer(PictureBox pictureBox, DrawingOption drawingOption)
         {
             _pictureBox = pictureBox;

@@ -4,14 +4,10 @@ namespace ShapeGenerator.Shapes
 {
     public class Rectangle : Shape
     {
-        public static int counter = 0;
-
         public Rectangle() { }
 
         public Rectangle(int size, Point startPoint) : base()
         {
-            counter++;
-            Id = counter;
             StartPoint = startPoint;
             Size = size;
             Name = $"{FigureShape.Rectangle}";

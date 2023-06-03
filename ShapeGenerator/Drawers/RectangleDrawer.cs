@@ -20,26 +20,24 @@ namespace ShapeGenerator.Drawers
             var maxY = _pictureBox.Height - _size;
             var point = new Point(_random.Next(maxX), _random.Next(maxY));
             var rectangle = new Rectangle(_size, point);
-            var stopwatch = new Stopwatch();
-            stopwatch.Start();
+            var attempts = 0;
 
-            if (_drawingOption != DrawingOption.Intersecting) 
+            if (_drawingOption != DrawingOption.Intersecting)
             {
                 while (CheckShapeIntersection(rectangle, shapes))
                 {
-                    if (stopwatch.ElapsedMilliseconds > 2500)
-                    {
-                        stopwatch.Stop();
-                        Rectangle.counter--;
+                    attempts++;
+
+                    if (attempts > maxAttempts)
                         throw new CanvasOverflowException("There was no place for a new figure on the canvas.");
-                    }
+
 
                     rectangle.StartPoint = new Point(_random.Next(maxX), _random.Next(maxY));
                     rectangle.Points = rectangle.CalculatePoints();
                 }
             }
-            
-            stopwatch.Stop();
+
+            rectangle.Id = shapes.Where(x => x.GetType() == typeof(Rectangle)).Count() + 1;
             return rectangle;
         }
     }

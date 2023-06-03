@@ -19,26 +19,23 @@ namespace ShapeGenerator.Drawers
             var maxY = (int)Math.Ceiling(_pictureBox.Height - _size * Math.Sqrt(3) / 2);
             var point = new Point(_random.Next(maxX), _random.Next(maxY));
             var triangle = new Triangle(_size, point);
-            var stopwatch = new Stopwatch();
-            stopwatch.Start();
+            var attempts = 0;
 
             if (_drawingOption != DrawingOption.Intersecting)
             {
                 while (CheckShapeIntersection(triangle, shapes))
                 {
-                    if (stopwatch.ElapsedMilliseconds > 2500)
-                    {
-                        stopwatch.Stop();
-                        Triangle.counter--;
+                    attempts++;
+
+                    if (attempts > maxAttempts)
                         throw new CanvasOverflowException("There was no place for a new figure on the canvas.");
-                    }
 
                     triangle.StartPoint = new Point(_random.Next(maxX), _random.Next(maxY));
                     triangle.Points = triangle.CalculatePoints();
                 }
             }
-            
-            stopwatch.Stop();
+
+            triangle.Id = shapes.Where(x => x.GetType() == typeof(Triangle)).Count() + 1;
             return triangle;
         }
     }
