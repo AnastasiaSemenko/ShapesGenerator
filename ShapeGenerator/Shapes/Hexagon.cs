@@ -2,6 +2,7 @@
 
 namespace ShapeGenerator.Shapes
 {
+    [Serializable]
     public class Hexagon : Shape
     {
         public Hexagon() : base() { }

@@ -2,6 +2,7 @@
 
 namespace ShapeGenerator.Shapes
 {
+    [Serializable]
     public abstract class Shape
     {
         public Point StartPoint { get; set; }

@@ -49,6 +49,7 @@
             splitter1 = new Splitter();
             listBoxShapesInfo = new ListBox();
             splitContainer1 = new SplitContainer();
+            checkBoxPositioning = new CheckBox();
             ((System.ComponentModel.ISupportInitialize)pictureBox).BeginInit();
             panel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
@@ -287,6 +288,7 @@
             // 
             // splitContainer1.Panel1
             // 
+            splitContainer1.Panel1.Controls.Add(checkBoxPositioning);
             splitContainer1.Panel1.Controls.Add(labelMaxNestingLevel);
             splitContainer1.Panel1.Controls.Add(buttonLoad);
             splitContainer1.Panel1.Controls.Add(buttonSave);
@@ -311,6 +313,17 @@
             splitContainer1.Size = new Size(1007, 515);
             splitContainer1.SplitterDistance = 724;
             splitContainer1.TabIndex = 22;
+            // 
+            // checkBoxPositioning
+            // 
+            checkBoxPositioning.AutoSize = true;
+            checkBoxPositioning.Location = new Point(211, 120);
+            checkBoxPositioning.Name = "checkBoxPositioning";
+            checkBoxPositioning.Size = new Size(104, 24);
+            checkBoxPositioning.TabIndex = 22;
+            checkBoxPositioning.Text = "Positioning";
+            checkBoxPositioning.UseVisualStyleBackColor = true;
+            checkBoxPositioning.CheckedChanged += checkBoxPositioning_CheckedChanged;
             // 
             // MainWindow
             // 
@@ -354,5 +367,6 @@
         private Splitter splitter1;
         private ListBox listBoxShapesInfo;
         private SplitContainer splitContainer1;
+        private CheckBox checkBoxPositioning;
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Enums.ShapeGenerator;
 using Newtonsoft.Json;
+using ShapeGenerator.Drawers;
 using ShapeGenerator.Enums;
 using ShapeGenerator.Exceptions;
 using ShapeGenerator.Shapes;
@@ -11,13 +12,14 @@ namespace ShapeGenerator
         private DrawerController _drawerController;
         private Button _selectedButton;
         private Shape _selectedShape;
+        private bool _positioning;
 
         public MainWindow()
         {
             InitializeComponent();
             MinimumSize = new Size(1050, 550);
-            _drawerController = new DrawerController(pictureBox);
             WindowState = FormWindowState.Maximized;
+            _drawerController = new DrawerController(pictureBox);
             UpdateSelectedButton(buttonSquare);
             _drawerController.FigureShape = FigureShape.Square;
             radioButtonIntersecting.Checked = true;
@@ -27,6 +29,7 @@ namespace ShapeGenerator
 
         private void ButtonGen_Click(object sender, EventArgs e)
         {
+
             _selectedShape = null;
 
             if (string.IsNullOrEmpty(textBoxFrom.Text) || string.IsNullOrEmpty(textBoxTo.Text))
@@ -44,19 +47,15 @@ namespace ShapeGenerator
                 return;
             }
 
+            buttonGen.Enabled = false;
             _drawerController.From = int.Parse(textBoxFrom.Text);
             _drawerController.To = int.Parse(textBoxTo.Text);
-            Cursor = Cursors.WaitCursor;
-
-            try
-            {
-                _drawerController.GenerateShapes();
-            }
-            catch (CanvasOverflowException ex)
-            {
-                ShowWarningMessageBox(ex.Message);
-            }
-
+            var progressForm = new ProgressForm();
+            progressForm.StartPosition = FormStartPosition.CenterParent;
+            var processThread = new Thread(_drawerController.GenerateShapes);
+            processThread.Start(progressForm);
+            progressForm.ShowDialog();
+            processThread.Join();
             pictureBox.Invalidate();
             UpdateListBoxShapesItems();
 
@@ -68,7 +67,7 @@ namespace ShapeGenerator
             else
                 labelMaxNestingLevel.Visible = false;
 
-            Cursor = Cursors.Default;
+            buttonGen.Enabled = true;
         }
 
         private void ButtonClear_Click(object sender, EventArgs e)
@@ -76,6 +75,9 @@ namespace ShapeGenerator
             labelMaxNestingLevel.Visible = false;
             _selectedShape = null;
             _drawerController.Shapes.Clear();
+            ShapeDrawer.ResetSize();
+            ShapeDrawer.InitializeOccupiedGrid(pictureBox.Width, pictureBox.Height, null);
+            ShapeDrawer.ResetNonLiquidPoints();
             listBoxShapesInfo.Items.Clear();
             pictureBox.Invalidate();
         }
@@ -100,6 +102,22 @@ namespace ShapeGenerator
                     e.DrawFocusRectangle();
                     var name = text.Split('\n')[0];
                     _selectedShape = _drawerController.GetSelectedShape(name);
+
+                    if (_positioning)
+                    {
+                        var center = ShapeDrawer.GetCenterPoint(_selectedShape);
+                        var targetX = center.X;
+                        var targetY = center.Y;
+                        var panelWidth = panel.ClientSize.Width;
+                        var panelHeight = panel.ClientSize.Height;
+                        var scrollX = (targetX - panelWidth / 2);
+                        var scrollY = (targetY - panelHeight / 2);
+                        scrollX = Math.Max(0, Math.Min(scrollX, pictureBox.Width - panelWidth));
+                        scrollY = Math.Max(0, Math.Min(scrollY, pictureBox.Height - panelHeight));
+                        panel.AutoScrollPosition = new Point(scrollX, scrollY);
+                        panel.Invalidate();
+                    }
+
                     pictureBox.Invalidate();
                 }
 
@@ -123,24 +141,28 @@ namespace ShapeGenerator
         {
             UpdateSelectedButton((Button)sender);
             _drawerController.FigureShape = FigureShape.Square;
+            _drawerController.UpdateDrawParamAfterChangingSelectedShape();
         }
 
         private void ButtonTriangle_Click(object sender, EventArgs e)
         {
             UpdateSelectedButton((Button)sender);
             _drawerController.FigureShape = FigureShape.Triangle;
+            _drawerController.UpdateDrawParamAfterChangingSelectedShape();
         }
 
         private void ButtonRectangle_Click(object sender, EventArgs e)
         {
             UpdateSelectedButton((Button)sender);
             _drawerController.FigureShape = FigureShape.Rectangle;
+            _drawerController.UpdateDrawParamAfterChangingSelectedShape();
         }
 
         private void ButtonHexagon_Click(object sender, EventArgs e)
         {
             UpdateSelectedButton((Button)sender);
             _drawerController.FigureShape = FigureShape.Hexagon;
+            _drawerController.UpdateDrawParamAfterChangingSelectedShape();
         }
 
         private void UpdateSelectedButton(Button newSelectedButton)
@@ -174,18 +196,24 @@ namespace ShapeGenerator
         {
             if (radioButtonIntersecting.Checked)
                 _drawerController.DrawingOption = DrawingOption.Intersecting;
+
+            _drawerController.UpdateDrawParamAfterChangingDrawingOptionOrLoadData();
         }
 
         private void radioButtonNonIntersecting_CheckedChanged(object sender, EventArgs e)
         {
             if (radioButtonNonIntersecting.Checked)
                 _drawerController.DrawingOption = DrawingOption.NonIntersecting;
+
+            _drawerController.UpdateDrawParamAfterChangingDrawingOptionOrLoadData();
         }
 
         private void radioButtonEnclosure_CheckedChanged(object sender, EventArgs e)
         {
             if (radioButtonEnclosure.Checked)
                 _drawerController.DrawingOption = DrawingOption.Enclosure;
+
+            _drawerController.UpdateDrawParamAfterChangingDrawingOptionOrLoadData();
         }
 
         private void buttonSave_Click(object sender, EventArgs e)
@@ -199,7 +227,7 @@ namespace ShapeGenerator
             {
                 try
                 {
-                    ShapesLoader.SaveShapes(_drawerController.Shapes, saveFileDialog.FileName);
+                    ShapesJsonLoader.SaveShapes(_drawerController.Shapes, saveFileDialog.FileName);
                 }
                 catch (IOException _)
                 {
@@ -222,7 +250,7 @@ namespace ShapeGenerator
             {
                 try
                 {
-                    var deserializedShapes = ShapesLoader.LoadShapes(openFileDialog.FileName);
+                    var deserializedShapes = ShapesJsonLoader.LoadShapes(openFileDialog.FileName);
                     _drawerController.Shapes = deserializedShapes;
                     _drawerController.Shapes.Sort(new FigureComparer());
                     pictureBox.Invalidate();
@@ -240,6 +268,8 @@ namespace ShapeGenerator
                 {
                     ShowErrorMessageBox(ex.Message);
                 }
+
+                _drawerController.UpdateDrawParamAfterChangingDrawingOptionOrLoadData();
             }
         }
 
@@ -278,6 +308,11 @@ namespace ShapeGenerator
             panel.AutoScrollMinSize = pictureBox.Size - new Size(verticalScrollBarWidth, horizontalScrollBarHeight);
             splitContainer1.Panel1MinSize = (int)(Width * 0.65);
             splitContainer1.PerformLayout();
+        }
+
+        private void checkBoxPositioning_CheckedChanged(object sender, EventArgs e)
+        {
+            _positioning = !_positioning;
         }
     }
 }

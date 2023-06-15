@@ -2,6 +2,7 @@
 
 namespace ShapeGenerator.Shapes
 {
+    [Serializable]
     public class Square : Shape
     {
         public Square() : base() { }

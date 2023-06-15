@@ -2,10 +2,9 @@
 
 namespace ShapeGenerator.Shapes
 {
+    [Serializable]
     public class Triangle : Shape
     {
-        public static int counter = 0;
-
         public Triangle() : base() { }
 
         public Triangle(int size, Point startPoint) : base()

@@ -1,5 +1,4 @@
 ﻿using Enums.ShapeGenerator;
-using Newtonsoft.Json;
 using ShapeGenerator.Drawers;
 using ShapeGenerator.Enums;
 using ShapeGenerator.Exceptions;
@@ -25,18 +24,46 @@ namespace ShapeGenerator
             _pictureBox = pictureBox;
         }
 
-        public void GenerateShapes()
+        public void GenerateShapes(object progressFormObj)
         {
+            ProgressForm progressForm = (ProgressForm)progressFormObj;
             var count = _random.Next(From, To + 1);
+            progressForm.SetMaximumProgress(count);
             var drawer = GetDrawerForShape();
+            var newShapes = new List<Shape>(Shapes);
 
             try
-            {
+            { 
                 for (var i = 0; i < count; i++)
                 {
-                    var shape = drawer.Draw(Shapes);
-                    Shapes.Add(shape);
+                    if (progressForm.Stopped)
+                    {
+                        Shapes.Clear();
+                        break;
+                    }
+                    else if (progressForm.Cancelled)
+                    { 
+                        newShapes.Clear();
+                        break;
+                    }
+
+                    var shape = drawer.Draw(newShapes);
+                    newShapes.Add(shape);
+                    progressForm.Invoke((MethodInvoker)delegate { progressForm.UpdateProgress(i + 1); });
+
+                    if (i + 1 == count)
+                        Shapes.Clear();
                 }
+
+                Shapes.AddRange(newShapes);
+                progressForm.Invoke((MethodInvoker)delegate { progressForm.Close(); });
+            }
+            catch (CanvasOverflowException ex)
+            {
+                Shapes.Clear();
+                Shapes.AddRange(newShapes);
+                progressForm.Invoke((MethodInvoker)delegate { progressForm.Close(); });
+                MainWindow.ShowWarningMessageBox(ex.Message);
             }
             finally
             {
@@ -81,6 +108,22 @@ namespace ShapeGenerator
                     Debug.WriteLine("Attempt to draw shapes of unknown type");
                     return null;
             }
+        }
+
+        public void UpdateDrawParamAfterChangingDrawingOptionOrLoadData()
+        {
+            if (Shapes.Count > 0)
+            {
+                ShapeDrawer.InitializeOccupiedGrid(_pictureBox.Width, _pictureBox.Height, Shapes, DrawingOption);
+                ShapeDrawer.ResetSize();
+                ShapeDrawer.ResetNonLiquidPoints();
+            }
+        }
+
+        public void UpdateDrawParamAfterChangingSelectedShape()
+        {
+            ShapeDrawer.ResetSize();
+            ShapeDrawer.ResetNonLiquidPoints();
         }
     }
 }
