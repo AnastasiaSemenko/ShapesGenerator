@@ -7,9 +7,9 @@ namespace ShapeGenerator.Drawers
     public class TriangleDrawer : ShapeDrawer
     {
         public TriangleDrawer(PictureBox pictureBox, DrawingOption drawingOption) :
-            base(pictureBox, drawingOption)
-        {
-        }
+            base(pictureBox, drawingOption) { }
+
+        public TriangleDrawer() : base() { }
 
         public override Shape Draw(List<Shape> shapes)
         {
@@ -42,8 +42,8 @@ namespace ShapeGenerator.Drawers
             var triangle = new Triangle(_currentSize, (Point)point);
             triangle.Points = triangle.CalculatePoints();
             triangle.Id = shapes.Count(x => x.GetType() == typeof(Triangle)) + 1;
-
             MarkOccupiedArea(triangle);
+
             return triangle;
         }
 

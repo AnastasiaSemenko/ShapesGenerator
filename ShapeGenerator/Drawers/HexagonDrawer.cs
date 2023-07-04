@@ -7,9 +7,9 @@ namespace ShapeGenerator.Drawers
     public class HexagonDrawer : ShapeDrawer
     {
         public HexagonDrawer(PictureBox pictureBox, DrawingOption drawingOption) :
-            base(pictureBox, drawingOption)
-        {
-        }
+            base(pictureBox, drawingOption) { }
+
+        public HexagonDrawer() : base() { }
 
         public override Shape Draw(List<Shape> shapes)
         {
@@ -42,8 +42,8 @@ namespace ShapeGenerator.Drawers
             var hexagon = new Hexagon(_currentSize, (Point)point);
             hexagon.Points = hexagon.CalculatePoints();
             hexagon.Id = shapes.Count(x => x.GetType() == typeof(Hexagon)) + 1;
-
             MarkOccupiedArea(hexagon);
+
             return hexagon;
         }
 

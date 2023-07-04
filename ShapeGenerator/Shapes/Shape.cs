@@ -12,6 +12,7 @@ namespace ShapeGenerator.Shapes
         public int Size { get; set; }
 
         public abstract Point[] CalculatePoints();
+
         public override string ToString()
         {
             var resultValue = new StringBuilder();

@@ -81,6 +81,7 @@
             pictureBox.TabIndex = 1;
             pictureBox.TabStop = false;
             pictureBox.Paint += pictureBox_Paint;
+            pictureBox.MouseDown += pictureBox_MouseDown;
             // 
             // buttonClear
             // 

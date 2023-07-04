@@ -7,9 +7,9 @@ namespace ShapeGenerator.Drawers
     public class SquareDrawer : ShapeDrawer
     {
         public SquareDrawer(PictureBox pictureBox, DrawingOption drawingOption) :
-            base(pictureBox, drawingOption)
-        {
-        }
+            base(pictureBox, drawingOption) { }
+
+        public SquareDrawer() : base() { }
 
         public override Shape Draw(List<Shape> shapes)
         {
@@ -42,8 +42,8 @@ namespace ShapeGenerator.Drawers
             var square = new Square(_currentSize, (Point)point);
             square.Points = square.CalculatePoints();
             square.Id = shapes.Count(x => x.GetType() == typeof(Square)) + 1;
-
             MarkOccupiedArea(square);
+
             return square;
         }
 

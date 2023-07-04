@@ -15,22 +15,20 @@ namespace ShapeGenerator.Shapes
             Points = CalculatePoints();
         }
 
-        public override Point[] CalculatePoints() 
+        public override Point[] CalculatePoints()
         {
-            Point[] points = new Point[6];
+            Point[] vertices = new Point[6];
+            var centerPoint = new Point(StartPoint.X + Size, StartPoint.Y + Size);
+            var yOffset = (int) Size / 2;
+            var xOffset = (int)Math.Sqrt(Size * Size - yOffset * yOffset);
+            vertices[0] = new Point(centerPoint.X, StartPoint.Y);
+            vertices[1] = new Point(centerPoint.X + xOffset, centerPoint.Y - yOffset);
+            vertices[2] = new Point(centerPoint.X + xOffset, centerPoint.Y + yOffset);
+            vertices[3] = new Point(centerPoint.X, StartPoint.Y + Size * 2);
+            vertices[4] = new Point(centerPoint.X - xOffset, centerPoint.Y + yOffset);
+            vertices[5] = new Point(centerPoint.X - xOffset, centerPoint.Y - yOffset);
 
-            for (var j = 0; j < 6; j++)
-            {
-                var centerX = StartPoint.X + Size;
-                var centerY = StartPoint.Y + Size;
-                var angle_deg = 60 * j - 30;
-                var angle_rad = Math.PI / 180 * angle_deg;
-                var x = (int)(centerX + Size * Math.Cos(angle_rad));
-                var y = (int)(centerY + Size * Math.Sin(angle_rad));
-                points[j] = new Point(x, y);
-            }
-
-            return points;
+            return vertices;
         }
     }
 }

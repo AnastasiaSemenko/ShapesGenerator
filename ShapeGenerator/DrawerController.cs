@@ -9,6 +9,11 @@ namespace ShapeGenerator
 {
     public class DrawerController
     {
+        public event EventHandler<int> StartDraw;
+        public event EventHandler EndDraw;
+        public delegate void DrawProgressEventHandler(object sender, int progress, out bool cancelled, out bool stopped);
+        public event DrawProgressEventHandler DrawProgress;
+
         private PictureBox _pictureBox;
         private Random _random = new();
 
@@ -24,45 +29,46 @@ namespace ShapeGenerator
             _pictureBox = pictureBox;
         }
 
-        public void GenerateShapes(object progressFormObj)
+        public async Task GenerateShapes()
         {
-            ProgressForm progressForm = (ProgressForm)progressFormObj;
             var count = _random.Next(From, To + 1);
-            progressForm.SetMaximumProgress(count);
+            StartDraw?.Invoke(this, count);
             var drawer = GetDrawerForShape();
             var newShapes = new List<Shape>(Shapes);
 
             try
-            { 
+            {
                 for (var i = 0; i < count; i++)
                 {
-                    if (progressForm.Stopped)
+                    var shape = await Task.Run(() => drawer.Draw(newShapes));
+                    newShapes.Add(shape);
+                    bool cancelled = false;
+                    bool stopped = false;
+                    DrawProgress?.Invoke(this, i + 1, out cancelled, out stopped);
+
+                    if (stopped)
                     {
                         Shapes.Clear();
                         break;
                     }
-                    else if (progressForm.Cancelled)
-                    { 
+                    else if (cancelled)
+                    {
                         newShapes.Clear();
                         break;
                     }
-
-                    var shape = drawer.Draw(newShapes);
-                    newShapes.Add(shape);
-                    progressForm.Invoke((MethodInvoker)delegate { progressForm.UpdateProgress(i + 1); });
 
                     if (i + 1 == count)
                         Shapes.Clear();
                 }
 
                 Shapes.AddRange(newShapes);
-                progressForm.Invoke((MethodInvoker)delegate { progressForm.Close(); });
+                EndDraw?.Invoke(this, EventArgs.Empty);
             }
             catch (CanvasOverflowException ex)
             {
                 Shapes.Clear();
                 Shapes.AddRange(newShapes);
-                progressForm.Invoke((MethodInvoker)delegate { progressForm.Close(); });
+                EndDraw?.Invoke(this, EventArgs.Empty);
                 MainWindow.ShowWarningMessageBox(ex.Message);
             }
             finally
@@ -84,6 +90,7 @@ namespace ShapeGenerator
             var array = str.Split(' ');
             var name = array[0];
             var id = int.Parse(array[1]);
+
             return Shapes.Find(s => s.Name == name && s.Id == id);
         }
 

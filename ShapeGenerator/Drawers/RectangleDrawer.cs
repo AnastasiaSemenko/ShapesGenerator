@@ -8,9 +8,9 @@ namespace ShapeGenerator.Drawers
     public class RectangleDrawer : ShapeDrawer
     {
         public RectangleDrawer(PictureBox pictureBox, DrawingOption drawingOption) :
-            base(pictureBox, drawingOption)
-        {
-        }
+            base(pictureBox, drawingOption) { }
+
+        public RectangleDrawer() : base() { }
 
         public override Shape Draw(List<Shape> shapes)
         {
@@ -43,8 +43,8 @@ namespace ShapeGenerator.Drawers
             var rectangle = new Rectangle(_currentSize, (Point)point);
             rectangle.Points = rectangle.CalculatePoints();
             rectangle.Id = shapes.Count(x => x.GetType() == typeof(Rectangle)) + 1;
-
             MarkOccupiedArea(rectangle);
+
             return rectangle;
         }
 

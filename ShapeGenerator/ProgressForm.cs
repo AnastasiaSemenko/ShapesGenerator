@@ -1,15 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
-
-namespace ShapeGenerator
+﻿namespace ShapeGenerator
 {
     public partial class ProgressForm : Form
     {
@@ -19,6 +8,14 @@ namespace ShapeGenerator
         public ProgressForm()
         {
             InitializeComponent();
+        }
+
+        public void CloseForm()
+        {
+            if (InvokeRequired)
+                Invoke(new MethodInvoker(CloseForm));
+            else
+                Close();
         }
 
         public void SetMaximumProgress(int maxValue)
@@ -35,14 +32,6 @@ namespace ShapeGenerator
         private void buttonCancel_Click(object sender, EventArgs e)
         {
             Cancelled = true;
-        }
-
-        public void CloseForm()
-        {
-            if (InvokeRequired)
-                Invoke(new MethodInvoker(CloseForm));
-            else
-                Close();
         }
 
         private void buttonStop_Click(object sender, EventArgs e)

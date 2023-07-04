@@ -21,7 +21,8 @@ namespace ShapeGenerator.Shapes
                 new Point(StartPoint.X, StartPoint.Y),
                 new Point(StartPoint.X + Size * 2, StartPoint.Y),
                 new Point(StartPoint.X + Size * 2, StartPoint.Y + Size),
-                    new Point(StartPoint.X, StartPoint.Y + Size) };
+                new Point(StartPoint.X, StartPoint.Y + Size) 
+            };
 
             return points;
         }

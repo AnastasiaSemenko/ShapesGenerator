@@ -24,6 +24,8 @@ namespace ShapeGenerator.Drawers
             _occupiedGrid ??= new bool[_pictureBox.Width, _pictureBox.Height];
         }
 
+        public ShapeDrawer() { }
+
         public abstract Shape Draw(List<Shape> shapes);
 
         public static Point GetCenterPoint(Shape shape)
@@ -64,10 +66,11 @@ namespace ShapeGenerator.Drawers
         {
             var dx = point2.X - point1.X;
             var dy = point2.Y - point1.Y;
+
             return Math.Sqrt(dx * dx + dy * dy);
         }
 
-        protected bool Intersection(Point pointA1, Point pointA2, Point pointB1, Point pointB2)
+        private bool Intersection(Point pointA1, Point pointA2, Point pointB1, Point pointB2)
         {
             var d1 = Direction(pointB1, pointB2, pointA1);
             var d2 = Direction(pointB1, pointB2, pointA2);
@@ -83,12 +86,12 @@ namespace ShapeGenerator.Drawers
             return segmentsIntersect || endpointsOverlap;
         }
 
-        protected int Direction(Point p1, Point p2, Point p3)
+        private int Direction(Point p1, Point p2, Point p3)
         {
             return (p2.X - p1.X) * (p3.Y - p1.Y) - (p3.X - p1.X) * (p2.Y - p1.Y);
         }
 
-        protected bool IsPointOnSegment(Point point, Point segmentStart, Point segmentEnd)
+        private bool IsPointOnSegment(Point point, Point segmentStart, Point segmentEnd)
         {
             var v1 = new Point(segmentEnd.X - segmentStart.X, segmentEnd.Y - segmentStart.Y);
             var v2 = new Point(point.X - segmentStart.X, point.Y - segmentStart.Y);
@@ -103,7 +106,7 @@ namespace ShapeGenerator.Drawers
             return false;
         }
 
-        protected bool CheckShapeIntersection(Shape shape, List<Shape> shapes)
+        public bool CheckShapeIntersection(Shape shape, List<Shape> shapes)
         {
             foreach (var otherShape in shapes)
             {
@@ -122,6 +125,7 @@ namespace ShapeGenerator.Drawers
                     }
                 }
             }
+
             return false;
         }
 
@@ -156,7 +160,7 @@ namespace ShapeGenerator.Drawers
             }
         }
 
-        protected static Point[] GetPointsOnShapeBoundary(Point[] vertices)
+        public static Point[] GetPointsOnShapeBoundary(Point[] vertices)
         {
             var pointsOnBoundary = new List<Point>();
 
@@ -173,6 +177,10 @@ namespace ShapeGenerator.Drawers
                     var x = currentVertex.X + j * (nextVertex.X - currentVertex.X) / maxDiff;
                     var y = currentVertex.Y + j * (nextVertex.Y - currentVertex.Y) / maxDiff;
                     var boundaryPoint = new Point { X = x, Y = y };
+
+                    if (pointsOnBoundary.Any(p => p.X == x && p.Y == y))
+                        continue;
+
                     pointsOnBoundary.Add(boundaryPoint);
                 }
             }
@@ -180,7 +188,7 @@ namespace ShapeGenerator.Drawers
             return pointsOnBoundary.ToArray();
         }
 
-        protected static Point[] GetPointsInsideShape(Point[] vertices)
+        private static Point[] GetPointsInsideShape(Point[] vertices)
         {
             var pointsInsideShape = new List<Point>();
             var minX = vertices.Min(p => p.X);

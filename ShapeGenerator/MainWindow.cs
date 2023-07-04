@@ -4,14 +4,17 @@ using ShapeGenerator.Drawers;
 using ShapeGenerator.Enums;
 using ShapeGenerator.Exceptions;
 using ShapeGenerator.Shapes;
+using System.Diagnostics;
 
 namespace ShapeGenerator
 {
     public partial class MainWindow : Form
     {
+        private Stopwatch? _stopwatch;
         private DrawerController _drawerController;
-        private Button _selectedButton;
-        private Shape _selectedShape;
+        private ProgressForm? _progressForm;
+        private Button? _selectedButton;
+        private Shape? _selectedShape;
         private bool _positioning;
 
         public MainWindow()
@@ -20,6 +23,9 @@ namespace ShapeGenerator
             MinimumSize = new Size(1050, 550);
             WindowState = FormWindowState.Maximized;
             _drawerController = new DrawerController(pictureBox);
+            _drawerController.StartDraw += DrawerController_StartDraw;
+            _drawerController.EndDraw += DrawerController_EndDraw;
+            _drawerController.DrawProgress += DrawerController_DrawProgress;
             UpdateSelectedButton(buttonSquare);
             _drawerController.FigureShape = FigureShape.Square;
             radioButtonIntersecting.Checked = true;
@@ -27,9 +33,13 @@ namespace ShapeGenerator
             listBoxShapesInfo.ItemHeight = listBoxShapesInfo.Font.Height * 2;
         }
 
-        private void ButtonGen_Click(object sender, EventArgs e)
+        private async void ButtonGen_Click(object sender, EventArgs e)
         {
+            await ButtonGen_ClickAsync(sender, e);
+        }
 
+        private async Task ButtonGen_ClickAsync(object sender, EventArgs e)
+        {
             _selectedShape = null;
 
             if (string.IsNullOrEmpty(textBoxFrom.Text) || string.IsNullOrEmpty(textBoxTo.Text))
@@ -50,12 +60,7 @@ namespace ShapeGenerator
             buttonGen.Enabled = false;
             _drawerController.From = int.Parse(textBoxFrom.Text);
             _drawerController.To = int.Parse(textBoxTo.Text);
-            var progressForm = new ProgressForm();
-            progressForm.StartPosition = FormStartPosition.CenterParent;
-            var processThread = new Thread(_drawerController.GenerateShapes);
-            processThread.Start(progressForm);
-            progressForm.ShowDialog();
-            processThread.Join();
+            await _drawerController.GenerateShapes();
             pictureBox.Invalidate();
             UpdateListBoxShapesItems();
 
@@ -313,6 +318,71 @@ namespace ShapeGenerator
         private void checkBoxPositioning_CheckedChanged(object sender, EventArgs e)
         {
             _positioning = !_positioning;
+        }
+
+        private void DrawerController_StartDraw(object sender, int totalCount)
+        {
+            _progressForm = new ProgressForm();
+            _progressForm.MinimumSize = new Size(300, 150);
+            _progressForm.StartPosition = FormStartPosition.Manual;
+            _progressForm.Left = Left + (Width - _progressForm.Width) / 2;
+            _progressForm.Top = Top + (Height - _progressForm.Height) / 2;
+            _progressForm.SetMaximumProgress(totalCount);
+            _stopwatch = new Stopwatch();
+            _stopwatch.Start();
+        }
+
+        private void DrawerController_EndDraw(object sender, EventArgs e)
+        {
+            _progressForm.Close();
+            _progressForm = null;
+            _stopwatch?.Stop();
+            _stopwatch = null;
+        }
+
+        private void DrawerController_DrawProgress(object sender, int progress, out bool cancelled, out bool stopped)
+        {
+            _progressForm.UpdateProgress(progress);
+            cancelled = _progressForm.Cancelled;
+            stopped = _progressForm.Stopped;
+
+            if (_stopwatch != null && _stopwatch.ElapsedMilliseconds > 1000)
+            {
+                _stopwatch.Stop();
+                _stopwatch = null;
+                _progressForm.Show();
+            }
+
+            _progressForm.Refresh();
+        }
+
+        private void pictureBox_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (_drawerController.Shapes == null)
+                return;
+
+            Shape curShape = null;
+            
+            foreach (var shape in _drawerController.Shapes)
+            {
+                if (ShapeDrawer.GetPointsOnShapeBoundary(shape.Points).Any(p => p.X == e.X && p.Y == e.Y))
+                { 
+                    curShape = shape;
+                    break;
+                } 
+            }
+
+            if (curShape == null)
+                return;
+
+            foreach (var shapeInListBox in listBoxShapesInfo.Items)
+            {
+                if (shapeInListBox.ToString().Split('\n')[0].Trim() == $"{curShape.Name} {curShape.Id}")
+                {
+                    listBoxShapesInfo.SelectedIndex = listBoxShapesInfo.Items.IndexOf(shapeInListBox);
+                    break;
+                }
+            }
         }
     }
 }
